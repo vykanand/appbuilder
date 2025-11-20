@@ -1,0 +1,30 @@
+{
+  "sites": [
+    {
+      "name": "demo",
+      "apis": [
+        {
+          "name": "userApi",
+          "url": "https://jsonplaceholder.typicode.com/users/1",
+          "method": "GET",
+          "headers": {}
+        },
+        {
+          "name": "userlist",
+          "url": "https://jsonplaceholder.typicode.com/users",
+          "method": "GET",
+          "headers": {},
+          "params": {},
+          "bodyTemplate": null
+        }
+      ],
+      "mappings": [
+        {
+          "placeholder": "username",
+          "apiName": "userApi",
+          "jsonPath": "name"
+        }
+      ]
+    }
+  ]
+}

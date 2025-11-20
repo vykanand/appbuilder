@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo Site</title>
+  </head>
+  <body>
+    <h1>Welcome to demo site {{userApi.address.suite}}</h1>
+    <p>User name from API: <strong>{{username}}</strong> you live here : {{userApi.address.street}}</p>    
+     <p> {{userApi.address}} </p>
+Name - <p> {{userApi.name}} </p> 
+
+{{#each userApi}}
+<!-- LOOP_START:loop_mi7er0yf_rdc8pi:userApi -->
+  <div class="loop-item">
+    {{this.email}}
+{{this.username}}
+  </div>{{this.id}}
+{{userApi.email}}
+<!-- LOOP_END:loop_mi7er0yf_rdc8pi -->
+{{/each}}
+Company - {{userApi.company.name}}
+
+
+<p>User list</p>
+
+{{#each userlist}}
+================
+  <div class="loop-item">
+<br>Name {{this.name}}
+<br>Email {{this.email}}
+<br>Phone {{userlist.phone}}{{this.website}}
+<br><br>
+  </div>
+================
+{{/each}}
+
+  </body>
+</html>

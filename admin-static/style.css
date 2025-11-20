@@ -1,0 +1,147 @@
+:root{
+  /* Lighter theme variables */
+  --bg: #f8fafc; /* page background */
+  --panel: #ffffff; /* sidebar / panels */
+  --card: #fbfdff; /* card backgrounds */
+  --muted: #64748b; /* slate muted text */
+  --accent: #2563eb; /* blue */
+  --accent-2: #06b6d4; /* teal */
+  --glass: rgba(2,6,23,0.03);
+  --radius:12px; --gap:16px; --shadow: 0 6px 18px rgba(15,23,42,0.08);
+  --maxWidth:1200px;
+  --viewer-height:450px; /* unified height for preview, editor, and palette */
+  /* Palette specific colors (adjusted for light theme) */
+  --palette-bg: rgba(245,248,255,0.9);
+  --palette-border: rgba(15,23,42,0.06);
+  --palette-key: #5b21b6; /* deeper lavender */
+  --palette-value: #b45309; /* amber/darker yellow */
+  --palette-array: #0ea5a4; /* cyan/teal */
+  --palette-object: #fb923c; /* coral/orange */
+  --palette-sample: #475569; /* muted sample text */
+  --palette-hover: rgba(2,6,23,0.03);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+.body-theme-light, body{
+  margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,#f8fafc 0%, #eef2ff 60%); color:#0f1724; -webkit-font-smoothing:antialiased;
+}
+.app-shell{display:flex;min-height:100vh;max-width:1400px;margin:24px auto;padding:12px;gap:16px}
+.sidebar{width:260px;background:linear-gradient(180deg,var(--panel),#f6fbff);border-radius:14px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.brand{display:flex;gap:12px;align-items:center}
+.brand .title{font-weight:700;font-size:1.05rem;color:var(--accent)}
+.brand .subtitle{font-size:0.78rem;color:var(--muted)}
+.sidebar-section{margin-top:18px}
+.section-title{font-size:0.78rem;color:var(--muted);margin-bottom:8px}
+.site-list{list-style:none;padding:0;margin:0;max-height:58vh;overflow:auto}
+.site-list li{padding:8px 10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;cursor:pointer}
+.site-list li:hover{background:rgba(37,99,235,0.06)}
+.site-list li.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
+.site-list .pages{list-style:none;padding-left:12px;margin-top:6px}
+.site-list .pages li{padding:6px;border-radius:6px;margin-bottom:4px;background:transparent;color:var(--muted);cursor:pointer}
+.site-list .pages li:hover{background:rgba(255,255,255,0.02);color:#e6eef8}
+.sidebar .btn{width:100%;margin-top:10px}
+.sidebar-footer{margin-top:auto}
+
+.main{flex:1;display:flex;flex-direction:column;gap:12px}
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;background:transparent;padding:6px 12px}
+.topbar .search input{padding:10px 12px;border-radius:10px;border:1px solid var(--palette-border);background:#fff;color:var(--muted);min-width:240px}
+.btn{background:var(--accent);color:white;padding:8px 12px;border-radius:10px;border:0;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;border:1px dashed rgba(15,23,42,0.06);color:var(--muted)}
+.btn.small{padding:6px 8px;font-size:0.9rem}
+.btn.outline{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+.content{padding:8px}
+.panel{max-width:var(--maxWidth);margin:0 auto}
+.panel-row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.card{flex:1;min-width:300px;background:linear-gradient(180deg,var(--card),#f8fbff);padding:14px;border-radius:12px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 6px 0;color:var(--accent)}
+.muted{color:var(--muted);margin-bottom:8px}
+.small{font-size:0.85rem}
+.form-row{display:flex;gap:8px;margin-top:12px}
+.input,textarea,select{background:#fff;border:1px solid var(--palette-border);color:#0f1724;padding:10px;border-radius:10px}
+select option{color:#0f1724;background:#ffffff}
+.two-col{display:flex;gap:8px}
+.divider{height:1px;background:rgba(255,255,255,0.03);margin:12px 0;border-radius:2px}
+.list{display:flex;flex-direction:column;gap:8px}
+.list .item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+.list .item .meta{color:var(--muted);font-size:0.9rem}
+.preview-wrap{height:var(--viewer-height);border-radius:10px;overflow:hidden;border:1px solid var(--palette-border);margin-top:8px;background:#fff}
+.preview-wrap iframe{width:100%;height:100%;border:0;background:white}
+
+/* Ensure readable text when editing or previewing content on light/white backgrounds.
+  Use the .light-bg helper class on elements that contain white/light backgrounds.
+  This keeps the dark chrome while forcing dark text only inside these light areas. */
+.light-bg, .light-bg * { color: #0f1724 !important; }
+.preview-wrap iframe{ background: white !important }
+
+/* Editor and palette share the same visual height */
+#pageEditor{height:var(--viewer-height);min-height:220px}
+
+.palette-item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px;cursor:grab}
+.palette-item:active{cursor:grabbing}
+
+/* Data tree styles for variable palette */
+.data-tree{font-size:0.95rem}
+.tree-root{margin-bottom:10px;padding:8px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid var(--palette-border)}
+.tree-node{padding:6px;display:flex;flex-direction:column}
+.node-label{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;transition:all .12s ease;cursor:grab;background:transparent}
+.node-label:hover{background:var(--palette-hover);transform:translateY(-1px)}
+.node-toggle{width:20px;display:inline-block;text-align:center;color:var(--palette-sample);font-weight:700}
+.node-text{color:var(--palette-key);font-weight:700}
+.node-sample{color:var(--palette-sample);margin-left:8px;font-size:0.9rem}
+
+/* Distinguish types visually using a strong left accent, vivid tint, and icon */
+.node-label.type-array{box-shadow:inset 6px 0 0 var(--palette-array);background:linear-gradient(90deg, rgba(6,182,212,0.16), rgba(6,182,212,0.02));border:1px solid rgba(6,182,212,0.12);color:#e8ffff}
+.node-label.type-array::before{content:"[]";display:inline-flex;align-items:center;justify-content:center;margin-right:8px;font-size:0.78rem;padding:4px;border-radius:6px;background:rgba(6,182,212,0.14);color:#00343a;font-weight:800}
+.node-label.type-array:hover{transform:translateY(-2px);box-shadow:inset 6px 0 0 var(--palette-array), 0 6px 18px rgba(6,182,212,0.06)}
+
+.node-label.type-object{box-shadow:inset 6px 0 0 var(--palette-object);background:linear-gradient(90deg, rgba(251,146,60,0.16), rgba(251,146,60,0.02));border:1px solid rgba(251,146,60,0.12);color:#fff6ef}
+.node-label.type-object::before{content:"{}";display:inline-flex;align-items:center;justify-content:center;margin-right:8px;font-size:0.78rem;padding:4px;border-radius:6px;background:rgba(251,146,60,0.14);color:#4a1f00;font-weight:800}
+.node-label.type-object:hover{transform:translateY(-2px);box-shadow:inset 6px 0 0 var(--palette-object), 0 6px 18px rgba(251,146,60,0.06)}
+
+.node-label.type-value{box-shadow:inset 6px 0 0 rgba(255,255,255,0.02);background:transparent}
+.node-label.type-value::before{content:"•";display:inline-block;margin-right:8px;color:var(--palette-value);font-size:1.1rem}
+
+/* value badges */
+.node-value-badge{margin-left:auto;padding:6px 10px;border-radius:999px;font-weight:800;font-size:0.86rem;background:linear-gradient(90deg,#fff7cc,#fff1b8);color:#5a3b00;border:1px solid rgba(255,255,255,0.06)}
+
+.node-children{margin-left:18px;border-left:1px dashed rgba(255,255,255,0.02);padding-left:10px;margin-top:6px}
+.loop-item{padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.04);background:rgba(255,255,255,0.015);margin:6px 0}
+
+/* small responsive tweak for long sample text */
+.node-sample{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36ch}
+
+/* Notifications */
+.ab-notify-wrap{ display:flex;gap:8px;align-items:center }
+.ab-notify{ color:#e6eef8; }
+.ab-notify-success{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
+.ab-notify-error{ background: linear-gradient(90deg,#d14343,#8b1f1f); }
+.ab-notify-info{ background: linear-gradient(90deg,#0ea5a4,#2563eb); }
+.ab-notify .btn.ghost{ background: transparent; border: 0; color: rgba(255,255,255,0.85); font-weight:600 }
+.node-children{margin-left:18px;border-left:1px dashed rgba(255,255,255,0.02);padding-left:8px;margin-top:4px}
+.loop-item{padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.04);background:rgba(255,255,255,0.015);margin:6px 0}
+
+/* Make the variable palette scrollable when content grows and match viewer height */
+#dataPalette{max-height:var(--viewer-height);overflow:auto;padding-right:6px}
+
+/* Loop Builder UI */
+.loop-builder{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
+.loop-builder .loop-preview{color:var(--muted);margin-top:6px}
+.loop-builder select.loop-field-select{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#dbeafe;padding:8px;border-radius:6px}
+
+code{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px}
+
+@media (max-width:900px){
+  .app-shell{flex-direction:column;padding:12px}
+  .sidebar{width:100%;flex-direction:row;align-items:center;padding:10px}
+  .site-list{display:flex;gap:8px;overflow:auto}
+  .site-list li{min-width:120px}
+  .panel-row{flex-direction:column}
+}
+
+small.muted{color:var(--muted);font-size:0.85rem}
+
+/* Guided tour (Intro.js) removed — related styles deleted to avoid loading unused css. */
+
+

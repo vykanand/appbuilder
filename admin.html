@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AppBuilder — Admin</title>
+    <link rel="stylesheet" href="/admin-static/style.css">
+    
+    <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="4" fill="var(--accent)"/><path d="M7 12h10M7 8h10M7 16h6" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div>
+            <div class="title">AppBuilder</div>
+            <div class="subtitle">No-code site integrations</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-title">Sites</div>
+          <ul id="siteList" class="site-list" data-intro="List of your managed sites. Click to open."></ul>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="siteNameInput" placeholder="site-name" style="flex:1" />
+            <button id="createSiteBtn" class="btn">Create</button>
+          </div>
+          <button id="newSiteBtn" class="btn ghost" style="margin-top:8px">+ New site</button>
+        </div>
+
+        
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="search">
+            <input id="searchInput" placeholder="Search sites, apis..." />
+          </div>
+          <div class="top-actions">
+            <a id="previewLink" class="btn outline" target="_blank" href="#">Open Preview</a>
+          </div>
+        </header>
+
+        <div class="content">
+          <div class="panel" id="panelOverview">
+            <div class="panel-row">
+              <div class="card" id="cardSiteInfo" data-intro="View and manage your site's files and folders here.">
+                <h3>Site Files</h3>
+                <div class="muted">Browse the selected website's folder and files. Click a file to open it in the editor.</div>
+                    <div id="siteFileTree" class="light-bg" style="margin-top:10px;max-height:360px;overflow:auto;padding:8px;background:#ffffff;border-radius:8px;color:#0f1724"></div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <input id="newPageNameInput" placeholder="new-page.html" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#dbeafe" />
+                  <button id="createPageBtn" class="btn small">Create Page</button>
+                </div>
+                <div id="siteActions" class="muted small" style="margin-top:8px"></div>
+              </div>
+
+              <div class="card" id="cardAPIs" data-intro="Add API connectors (third-party) for the selected site.">
+                <h3>APIs</h3>
+                <div id="apiList" class="list"></div>
+                <div class="divider"></div>
+                <input id="apiNameInput" placeholder="API name (identifier)" />
+                <input id="apiUrlInput" placeholder="https://api.example.com/endpoint" />
+                <div class="two-col">
+                  <select id="apiMethodSelect" style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:#dbeafe">
+                    <option value="GET" selected>GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                    <option value="HEAD">HEAD</option>
+                  </select>
+                  <input id="apiHeadersInput" placeholder='Headers (JSON)' />
+                </div>
+                <div class="divider"></div>
+                <label style="margin-top:8px">Query Params (JSON)</label>
+                <input id="apiParamsInput" placeholder='{"q":"search"}' />
+                <label>Body Template (JSON or raw)</label>
+                <textarea id="apiBodyInput" placeholder='{"key": "value"}' style="min-height:80px"></textarea>
+                <button id="addApiBtn" class="btn">Add API</button>
+              </div>
+            </div>
+
+            
+            </div>
+          </div>
+          <!-- Live preview placed after panelOverview -->
+          <div class="panel-row">
+            <div class="card" id="cardPreview" data-intro="Preview your live site in an iframe. Click preview to open full tab.">
+              <h3>Live Preview</h3>
+              <div class="muted">Live preview of selected site's page. It updates on save.</div>
+              <div class="preview-wrap" style="margin-top:8px">
+                <iframe id="previewFrame" src="about:blank"></iframe>
+              </div>
+            </div>
+          </div>
+              <div class="card" id="cardPages" data-intro="Edit pages in-place. Drag variables from the palette into the editor.">
+                <h3>Pages & Editor</h3>
+                <div class="muted">Open a page, edit HTML, insert variables from the palette, and save.</div>
+                <div class="two-col" style="margin-top:10px;gap:12px">
+                  <select id="pageSelect" style="flex:1"></select>
+                  <button id="loadPageBtn" class="btn">Open</button>
+                  <button id="openVisualEditor" class="btn outline">Open Visual Editor</button>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;gap:12px">
+                    <div style="flex:1;min-width:360px">
+                    <div class="muted small">HTML Editor</div>
+                    <textarea id="pageEditor" class="light-bg" style="width:100%;border-radius:8px;margin-top:8px;padding:12px;font-family:Consolas,monospace;background:#ffffff;color:#0f1724"> </textarea>
+                    <div style="display:flex;gap:8px;margin-top:8px"><button id="savePageBtn" class="btn">Save Page</button><button id="previewRenderedBtn" class="btn outline">Preview Rendered</button></div>
+                  </div>
+                  <div style="width:320px">
+                    <div class="muted small">Variable Palette (drag into editor)</div>
+                    <div id="dataPalette" style="margin-top:8px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;"></div>
+                    <div class="muted small" style="margin-top:12px">Tip: Drag an item to the editor to insert <code>{{api.path}}</code>. For loops, insert <code>{{#each api.path}}</code> and <code>{{/each}}</code> around a block and use <code>{{this.field}}</code> inside.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- GrapesJS editor modal -->
+            <div id="gjs-modal" style="display:none;position:fixed;inset:40px;background:rgba(7,18,34,0.9);z-index:9999;padding:12px;border-radius:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <div style="color:#fff;font-weight:700">Visual Editor</div>
+                <div>
+                  <button id="saveVisualBtn" class="btn">Save</button>
+                  <button id="closeVisualBtn" class="btn ghost">Close</button>
+                </div>
+              </div>
+              <div id="gjs" class="light-bg" style="height:80%;background:#fff"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="/admin-static/utils.js"></script>
+    <script src="https://unpkg.com/grapesjs/dist/grapes.min.js"></script>
+    <script src="/admin-static/app.js"></script>
+  </body>
+</html>
