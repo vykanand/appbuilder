@@ -1,3 +1,23 @@
+// Process API test result and save to API list
+async function processApiTestResult(apiDef, responseData) {
+  if (!selectedSite || !apiDef) return;
+  // Update the API definition with the response data as sample
+  const updatedApiDef = { ...apiDef, sample: responseData };
+  try {
+    const resp = await fetch(`/api/sites/${selectedSite.name}/apis/${encodeURIComponent(apiDef.name)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedApiDef)
+    });
+    if (!resp.ok) throw new Error('Failed to update API');
+    showMessage('API updated with test result', 'Saved');
+    await selectSite(selectedSite.name); // refresh
+  } catch (err) {
+    console.error(err);
+    showMessage('Failed to save API', 'Error');
+  }
+}
+
 // REST Client Modal Integration
 function openRestClientModal(apiName, apiDef) {
   let modal = document.getElementById('restClientModal');
@@ -1139,6 +1159,344 @@ const addApiBtn = qs('#addApiBtn'); if(addApiBtn) addApiBtn.addEventListener('cl
 
 // manual mapping UI removed — mappings are created automatically from palette drops and visual editor bindings
 
+// Unified REST client modal function
+function openRestClientModal(title, apiDef, initialBody = null) {
+  let body = initialBody;
+const style = `body { font-family: 'Inter', Arial, sans-serif; background: #23272f; margin: 0; padding: 0; }
+.container { max-width: 900px; margin: 0 auto; background: #2c313a; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.18); padding: 32px; color: #e2e8f0; }
+h1 { margin-top: 0; font-weight: 600; color: #fff; }
+.row { display: flex; gap: 12px; }
+.row > * { flex: 1; }
+label { font-weight: 600; margin-top: 16px; display: block; color: #a0aec0; }
+input, select, textarea { width: 100%; padding: 8px; margin-top: 6px; border-radius: 6px; border: 1px solid #4a5568; font-size: 1rem; background: #23272f; color: #e2e8f0; }
+textarea { min-height: 80px; font-family: monospace; }
+button { padding: 10px 24px; border-radius: 6px; border: none; background: #6366f1; color: #fff; font-weight: 600; cursor: pointer; margin-top: 18px; }
+button:hover { background: #4338ca; }
+.tabs { display: flex; gap: 0; margin-top: 18px; border-bottom: 1px solid #4a5568; }
+.tab { padding: 12px 24px; cursor: pointer; background: #23272f; color: #a0aec0; border: none; border-radius: 8px 8px 0 0; font-weight: 600; margin-right: 2px; }
+.tab.active { background: #2c313a; color: #fff; border-bottom: 2px solid #6366f1; }
+.tab-content { display: none; margin-top: 0; }
+.tab-content.active { display: block; }
+.note { margin: 18px 0; color: #a0aec0; font-size: 1rem; }
+.response-section { margin-top: 32px; }
+.response-header { font-weight: 600; color: #fff; margin-bottom: 8px; }
+pre { background: #23272f; padding: 12px; border-radius: 8px; max-height: 350px; overflow: auto; color: #e2e8f0; border: 1px solid #4a5568; }
+.status-success { color: #22c55e; font-weight: 600; }
+.status-error { color: #ef4444; font-weight: 600; }
+.method-select { width: 120px; }
+.url-input { flex: 1; }
+.send-btn { margin-left: 12px; }
+.header-row, .param-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.header-row input, .param-row input { flex: 1; }
+.remove-btn { background: #ef4444; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.9rem; cursor: pointer; }
+.remove-btn:hover { background: #b91c1c; }
+.add-btn { background: #6366f1; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.9rem; cursor: pointer; margin-top: 8px; }
+.add-btn:hover { background: #4338ca; }
+.multipart-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.multipart-row input[type="text"] {
+  width: 160px;
+  min-width: 120px;
+}
+.multipart-row input[type="file"] {
+  width: 180px;
+  min-width: 120px;
+}
+.multipart-row select {
+  width: 110px;
+  min-width: 80px;
+}
+.multipart-row .remove-btn {
+  margin-left: 8px;
+}`;
+const containerHtml = `<div class="container">
+  <h1>REST Client</h1>
+  <div class="note">Professional REST client. Supports all HTTP methods, advanced options, and a Postman-like UI.</div>
+  <form id="restForm" autocomplete="off">
+    <div class="row">
+      <select id="method" class="method-select">
+        <option>GET</option>
+        <option>POST</option>
+        <option>PUT</option>
+        <option>PATCH</option>
+        <option>DELETE</option>
+        <option>OPTIONS</option>
+        <option>HEAD</option>
+      </select>
+      <input id="url" class="url-input" type="text" placeholder="https://api.example.com/resource" required />
+      <button type="submit" class="send-btn">Send</button>
+    </div>
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="params">Params</button>
+      <button type="button" class="tab" data-tab="headers">Headers</button>
+      <button type="button" class="tab" data-tab="auth">Auth</button>
+      <button type="button" class="tab" data-tab="body">Body</button>
+    </div>
+    <div id="tab-params" class="tab-content active">
+      <div id="params-list"></div>
+      <button type="button" class="add-btn" id="add-param">+ Add Param</button>
+    </div>
+    <div id="tab-headers" class="tab-content">
+      <div id="headers-list"></div>
+      <button type="button" class="add-btn" id="add-header">+ Add Header</button>
+    </div>
+    <div id="tab-auth" class="tab-content">
+      <label for="auth-type">Auth Type</label>
+      <select id="auth-type">
+        <option value="none">None</option>
+        <option value="basic">Basic Auth</option>
+        <option value="bearer">Bearer Token</option>
+      </select>
+      <div id="auth-fields" style="margin-top:12px"></div>
+    </div>
+    <div id="tab-body" class="tab-content">
+      <label for="body-type">Body Type</label>
+      <select id="body-type">
+        <option value="raw">Raw</option>
+        <option value="json">JSON</option>
+        <option value="form">Form Data</option>
+        <option value="multipart">Multipart Form</option>
+      </select>
+      <div id="body-multipart-fields" style="display:none; margin-top:12px;"></div>
+      <textarea id="body" placeholder="Request body"></textarea>
+    </div>
+  </form>
+  <div class="response-section" id="result" style="display:none">
+    <div class="response-header">
+      <span id="status" class="status-success"></span>
+      <span id="status-text"></span>
+    </div>
+    <pre id="response"></pre>
+    <button id="saveApiTestResultBtn" class="btn" style="display:none;margin-top:8px;">Save</button>
+  </div>
+</div>`;
+const restClientHtml = `<div style="max-height:80vh;overflow:auto;"><style>${style}</style>${containerHtml}</div>`;
+  AppUtils.Modal.show({ title, body: restClientHtml });
+  setTimeout(() => {
+    // Populate fields
+    if (apiDef) {
+      document.getElementById('url').value = apiDef.url || '';
+      document.getElementById('method').value = apiDef.method || 'GET';
+      if (apiDef.headers) {
+        Object.entries(apiDef.headers).forEach(([k,v]) => {
+          addRow('headers-list', 'header');
+          const rows = document.querySelectorAll('#headers-list .header-row');
+          const last = rows[rows.length - 1];
+          last.querySelector('.header-key').value = k;
+          last.querySelector('.header-value').value = v;
+        });
+      }
+      if (apiDef.params) {
+        Object.entries(apiDef.params).forEach(([k,v]) => {
+          addRow('params-list', 'param');
+          const rows = document.querySelectorAll('#params-list .param-row');
+          const last = rows[rows.length - 1];
+          last.querySelector('.param-key').value = k;
+          last.querySelector('.param-value').value = v;
+        });
+      }
+      if (apiDef.bodyTemplate) {
+        document.getElementById('body').value = typeof apiDef.bodyTemplate === 'string' ? apiDef.bodyTemplate : JSON.stringify(apiDef.bodyTemplate, null, 2);
+        document.getElementById('body-type').value = 'json';
+      }
+    }
+    // If initial body, show result
+    if (body) {
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('status').textContent = 'Initial';
+      document.getElementById('status').className = 'status-success';
+      document.getElementById('status-text').textContent = ' Response';
+      document.getElementById('response').textContent = typeof body === 'string' ? body : JSON.stringify(body, null, 2);
+      document.getElementById('saveApiTestResultBtn').style.display = 'inline-block';
+    }
+    // Tab logic
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      };
+    });
+    // Dynamic Params/Headers
+    function addRow(listId, type) {
+      const div = document.createElement('div');
+      div.className = type + '-row';
+      div.innerHTML = `<input type="text" placeholder="Key" class="${type}-key" /> <input type="text" placeholder="Value" class="${type}-value" /> <button type="button" class="remove-btn">Remove</button>`;
+      div.querySelector('.remove-btn').onclick = () => div.remove();
+      document.getElementById(listId).appendChild(div);
+    }
+    document.getElementById('add-param').onclick = () => addRow('params-list', 'param');
+    document.getElementById('add-header').onclick = () => addRow('headers-list', 'header');
+    // Auth fields
+    function renderAuthFields() {
+      const type = document.getElementById('auth-type').value;
+      const container = document.getElementById('auth-fields');
+      container.innerHTML = '';
+      if (type === 'basic') {
+        container.innerHTML = '<input type="text" id="auth-user" placeholder="Username" /><input type="password" id="auth-pass" placeholder="Password" />';
+      } else if (type === 'bearer') {
+        container.innerHTML = '<input type="text" id="auth-token" placeholder="Bearer Token" />';
+      }
+    }
+    document.getElementById('auth-type').onchange = renderAuthFields;
+    renderAuthFields();
+    // Body type logic
+    document.getElementById('body-type').onchange = function() {
+      const type = this.value;
+      const body = document.getElementById('body');
+      const multipartFields = document.getElementById('body-multipart-fields');
+      if (type === 'json') {
+        body.style.display = '';
+        body.placeholder = '{\n  \n}';
+        multipartFields.style.display = 'none';
+      } else if (type === 'form') {
+        body.style.display = '';
+        body.placeholder = 'key1=value1&key2=value2';
+        multipartFields.style.display = 'none';
+      } else if (type === 'multipart') {
+        body.style.display = 'none';
+        multipartFields.style.display = '';
+      } else {
+        body.style.display = '';
+        body.placeholder = 'Request body';
+        multipartFields.style.display = 'none';
+      }
+    };
+    // Multipart field logic
+    function addMultipartField() {
+      const div = document.createElement('div');
+      div.className = 'multipart-row';
+      div.innerHTML = `<input type="text" placeholder="Field name" class="multipart-key" /> <input type="text" placeholder="Value" class="multipart-value" /> <input type="file" class="multipart-file" style="display:none" /> <select class="multipart-type"><option value="text">Text</option><option value="file">File</option></select> <button type="button" class="remove-btn">Remove</button>`;
+      const typeSelect = div.querySelector('.multipart-type');
+      const fileInput = div.querySelector('.multipart-file');
+      const valueInput = div.querySelector('.multipart-value');
+      typeSelect.onchange = function() {
+        if (typeSelect.value === 'file') {
+          fileInput.style.display = '';
+          valueInput.style.display = 'none';
+        } else {
+          fileInput.style.display = 'none';
+          valueInput.style.display = '';
+        }
+      };
+      div.querySelector('.remove-btn').onclick = () => div.remove();
+      document.getElementById('body-multipart-fields').appendChild(div);
+    }
+    // Add button for multipart fields
+    if (!document.getElementById('add-multipart')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'add-btn';
+      btn.id = 'add-multipart';
+      btn.textContent = '+ Add Multipart Field';
+      btn.onclick = addMultipartField;
+      document.getElementById('body-multipart-fields').appendChild(btn);
+    }
+    // Form submit
+    document.getElementById('restForm').onsubmit = async function(e) {
+      e.preventDefault();
+      let method = document.getElementById('method').value;
+      let url = document.getElementById('url').value.trim();
+      // Params
+      let params = {};
+      document.querySelectorAll('#params-list .param-row').forEach(row => {
+        const k = row.querySelector('.param-key').value;
+        const v = row.querySelector('.param-value').value;
+        if (k) params[k] = v;
+      });
+      if (Object.keys(params).length) {
+        const qp = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
+        url += (url.includes('?') ? '&' : '?') + qp;
+      }
+      // Headers
+      let headers = {};
+      document.querySelectorAll('#headers-list .header-row').forEach(row => {
+        const k = row.querySelector('.header-key').value;
+        const v = row.querySelector('.header-value').value;
+        if (k) headers[k] = v;
+      });
+      // Auth
+      const authType = document.getElementById('auth-type').value;
+      if (authType === 'basic') {
+        const user = document.getElementById('auth-user').value;
+        const pass = document.getElementById('auth-pass').value;
+        if (user && pass) {
+          headers['Authorization'] = 'Basic ' + btoa(user + ':' + pass);
+        }
+      } else if (authType === 'bearer') {
+        const token = document.getElementById('auth-token').value;
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+      }
+      // Body
+      let bodyData = document.getElementById('body').value;
+      const bodyType = document.getElementById('body-type').value;
+      let options = { method, headers };
+      if (method !== 'GET' && method !== 'HEAD') {
+        if (bodyType === 'json') {
+          headers['Content-Type'] = 'application/json';
+          options.body = bodyData;
+        } else if (bodyType === 'form') {
+          headers['Content-Type'] = 'application/x-www-form-urlencoded';
+          options.body = bodyData;
+        } else if (bodyType === 'multipart') {
+          const formData = new FormData();
+          document.querySelectorAll('#body-multipart-fields .multipart-row').forEach(row => {
+            const key = row.querySelector('.multipart-key').value;
+            const type = row.querySelector('.multipart-type').value;
+            if (type === 'file') {
+              const fileInput = row.querySelector('.multipart-file');
+              if (fileInput.files.length > 0) {
+                formData.append(key, fileInput.files[0]);
+              }
+            } else {
+              const value = row.querySelector('.multipart-value').value;
+              formData.append(key, value);
+            }
+          });
+          options.body = formData;
+          // Do not set Content-Type header for multipart, browser will set it
+          delete headers['Content-Type'];
+        } else {
+          options.body = bodyData;
+        }
+      }
+      try {
+        const resp = await fetch(url, options);
+        let text;
+        let status = resp.status;
+        let statusText = resp.statusText;
+        try { text = await resp.json(); } catch { text = await resp.text(); }
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('status').textContent = status;
+        document.getElementById('status').className = status >= 200 && status < 300 ? 'status-success' : 'status-error';
+        document.getElementById('status-text').textContent = ' ' + statusText;
+        document.getElementById('response').textContent = typeof text === 'string' ? text : JSON.stringify(text, null, 2);
+        body = text;
+        document.getElementById('saveApiTestResultBtn').style.display = 'inline-block';
+      } catch (err) {
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('status').textContent = 'Error';
+        document.getElementById('status').className = 'status-error';
+        document.getElementById('status-text').textContent = '';
+        document.getElementById('response').textContent = 'Error: ' + (err.message || String(err));
+      }
+    };
+    // Save button handler
+    const saveBtn = document.getElementById('saveApiTestResultBtn');
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        processApiTestResult(apiDef, body);
+        AppUtils.Modal.hide && AppUtils.Modal.hide();
+      };
+    }
+  }, 100);
+}
+
 // Consolidated API list event listener
 const apiListEl = qs('#apiList');
 if(apiListEl) {
@@ -1148,7 +1506,25 @@ if(apiListEl) {
     if(btn.dataset.api){
       const apiName = btn.dataset.api;
       if(!selectedSite) { showMessage('Select a site first','Error'); return; }
-      try{ AppUtils.Loader.show('Testing API...'); const resp = await fetch(`/api/sites/${selectedSite.name}/endpoints/${encodeURIComponent(apiName)}/execute`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}); AppUtils.Loader.hide(); let body; try{ body = await resp.json(); }catch(e){ body = await resp.text(); } AppUtils.Modal.show({ title:`Endpoint: ${apiName} — status ${resp.status}`, body: `<pre class="api-body-pre">${escapeHtml(typeof body === 'string' ? body : JSON.stringify(body, null, 2))}</pre>` }); console.log('endpoint execute result', body); }catch(err){ AppUtils.Loader.hide(); console.error(err); AppUtils.Modal.show({ title:'Error', body: escapeHtml(err.message || String(err)) }); }
+      try{ AppUtils.Loader.show('Testing API...'); const resp = await fetch(`/api/sites/${selectedSite.name}/endpoints/${encodeURIComponent(apiName)}/execute`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}); AppUtils.Loader.hide(); let body; try{ body = await resp.json(); }catch(e){ body = await resp.text(); } 
+        const html = `<div style="max-height:40vh;overflow:auto"><pre class="api-body-pre">${escapeHtml(typeof body === 'string' ? body : JSON.stringify(body, null, 2))}</pre></div>
+          <div style="margin-top:8px;text-align:right"><button id="saveApiTestResultBtn" class="btn">Save</button></div>`;
+        AppUtils.Modal.show({
+          title: `Endpoint: ${apiName} — status ${resp.status}`,
+          body: html
+        });
+        console.log('endpoint execute result', body);
+        setTimeout(() => {
+          const saveBtn = document.getElementById('saveApiTestResultBtn');
+          if (saveBtn) {
+            saveBtn.onclick = () => {
+              const apiDef = (selectedSite.apis || []).find(a => a.name === apiName);
+              processApiTestResult(apiDef, body);
+              AppUtils.Modal.hide && AppUtils.Modal.hide();
+            };
+          }
+        }, 100);
+      }catch(err){ AppUtils.Loader.hide(); console.error(err); AppUtils.Modal.show({ title:'Error', body: escapeHtml(err.message || String(err)) }); }
       return;
     }
     // Edit API button

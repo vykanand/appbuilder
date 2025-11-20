@@ -22,54 +22,6 @@ Addr - {{userApi.address.suite}}
 Company - {{userApi.company.name}}
 {{submituser}}
 
-<form id="abform_mi7mhx6z_3ll9" style="padding:12px;border:1px solid #ddd;border-radius:8px;margin:8px 0">
-  <h3>POST submituser</h3>
-  <label>{
-  "name": "Vikas",
-  "email": "vikas@example.com"
-}
-: <input type="text" name="{
-  "name": "Vikas",
-  "email": "vikas@example.com"
-}
-" data-field="{
-  "name": "Vikas",
-  "email": "vikas@example.com"
-}
-"></label><br>
-<label>id: <input type="number" name="id" data-field="id"></label><br>
-  <button type="submit">Submit</button>
-</form>
-<script>
-document.getElementById('abform_mi7mhx6z_3ll9').addEventListener('submit', async function(e){
-  e.preventDefault();
-  var data = {};
-  this.querySelectorAll('input, textarea, select').forEach(function(inp){
-    var field = inp.getAttribute('data-field') || inp.name;
-    if(!field) return;
-    if(inp.type === 'checkbox') data[field] = inp.checked; else data[field] = inp.value;
-  });
-  try{
-    var headers = {};
-    var bodyPayload = null;
-    if('application/json' === 'application/x-www-form-urlencoded'){
-      var params = new URLSearchParams();
-      Object.keys(data).forEach(function(k){ params.append(k, data[k]); });
-      bodyPayload = params.toString(); headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    } else {
-      // default to JSON
-      bodyPayload = JSON.stringify({ body: data }); headers['Content-Type'] = 'application/json';
-    }
-    var resp = await fetch('/api/sites/demo/endpoints/submituser/execute', {
-      method: 'POST',
-      headers: headers,
-      body: bodyPayload
-    });
-    var result = await resp.json();
-    alert('Success: ' + JSON.stringify(result));
-    this.reset();
-  }catch(err){
-    alert('Error: ' + err.message);
-  }
-});
-</script>
+
+<button id="abbtn_mi7x14um_g69n" data-ab-api="submituser" data-ab-method="POST" style="padding:8px 16px;background:#3b82f6;color:white;border:0;border-radius:8px;cursor:pointer;font-weight:600">POST submituser</button>
+<script>(function(){var b=document.getElementById('abbtn_mi7x14um_g69n'); if(!b) return; b.addEventListener('click', async function(){ try{ var resp = await fetch('/api/sites/demo/endpoints/'+encodeURIComponent('submituser')+'/execute', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({}) }); var result = await resp.json(); alert('POST submituser: ' + JSON.stringify(result)); }catch(e){ alert('Failed: '+(e&&e.message?e.message:String(e))); } });})()</script>
