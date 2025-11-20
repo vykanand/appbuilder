@@ -48,7 +48,7 @@
               <div class="card" id="cardSiteInfo" data-intro="View and manage your site's files and folders here.">
                 <h3>Site Files</h3>
                 <div class="muted">Browse the selected website's folder and files. Click a file to open it in the editor.</div>
-                    <div id="siteFileTree" class="light-bg" style="margin-top:10px;max-height:360px;overflow:auto;padding:8px;background:#ffffff;border-radius:8px;color:#0f1724"></div>
+                <div id="siteFileTree" style="margin-top:10px;max-height:360px;overflow:auto;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px"></div>
                 <div style="display:flex;gap:8px;margin-top:8px">
                   <input id="newPageNameInput" placeholder="new-page.html" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#dbeafe" />
                   <button id="createPageBtn" class="btn small">Create Page</button>
@@ -91,7 +91,7 @@
             <div class="card" id="cardPreview" data-intro="Preview your live site in an iframe. Click preview to open full tab.">
               <h3>Live Preview</h3>
               <div class="muted">Live preview of selected site's page. It updates on save.</div>
-              <div class="preview-wrap" style="margin-top:8px">
+              <div class="preview-wrap light-bg" style="margin-top:8px">
                 <iframe id="previewFrame" src="about:blank"></iframe>
               </div>
             </div>
@@ -108,7 +108,7 @@
                 <div style="display:flex;gap:12px">
                     <div style="flex:1;min-width:360px">
                     <div class="muted small">HTML Editor</div>
-                    <textarea id="pageEditor" class="light-bg" style="width:100%;border-radius:8px;margin-top:8px;padding:12px;font-family:Consolas,monospace;background:#ffffff;color:#0f1724"> </textarea>
+                    <textarea id="pageEditor" style="width:100%;border-radius:8px;margin-top:8px;padding:12px;font-family:Consolas,monospace;"> </textarea>
                     <div style="display:flex;gap:8px;margin-top:8px"><button id="savePageBtn" class="btn">Save Page</button><button id="previewRenderedBtn" class="btn outline">Preview Rendered</button></div>
                   </div>
                   <div style="width:320px">
