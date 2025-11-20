@@ -24,7 +24,7 @@
       // support multiple content keys for compatibility: body, html, text
       if(opts.body){ content.innerHTML = opts.body; }
       else if(opts.html){ content.innerHTML = opts.html; }
-      else if(opts.text){ const pre = document.createElement('pre'); pre.style.cssText='white-space:pre-wrap;word-break:break-word;color:#dbeafe;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px'; pre.textContent = opts.text; content.appendChild(pre); }
+      else if(opts.text){ const pre = document.createElement('pre'); pre.className = 'api-body-pre'; pre.textContent = opts.text; content.appendChild(pre); }
       dlg.appendChild(content);
       const footer = document.createElement('div'); footer.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:12px';
       if(opts.buttons && Array.isArray(opts.buttons)){

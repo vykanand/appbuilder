@@ -1,5 +1,7 @@
 :root{
-  --bg:#0f1724; --panel:#0b1220; --card:#0f1728; --muted:#9aa4b2; --accent:#4f46e5; --accent-2:#06b6d4; --glass: rgba(255,255,255,0.03);
+  --bg:#071025; --panel:#071a2b; --card:#0b2236; --muted:#9fb6d8; --accent:#4f46e5; --accent-2:#06b6d4; --glass: rgba(255,255,255,0.03);
+  --text: #e6eef8; --modal-bg: linear-gradient(180deg,#062033,#062b44); --modal-fg: #e6eef8;
+  --card-light: #123248; /* slightly lighter than --card for dropdowns/options */
   --radius:12px; --gap:16px; --shadow: 0 6px 18px rgba(2,6,23,0.6);
   --maxWidth:1200px;
   --viewer-height:450px; /* unified height for preview, editor, and palette */
@@ -16,8 +18,8 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: linear-gradient(180deg,#051025 0%, #07122a 60%); color:#ffffff; -webkit-font-smoothing:antialiased;
+  margin:0; font-family:Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, -apple-system;
+  background: linear-gradient(180deg,#051025 0%, #07122a 60%); color:var(--text); -webkit-font-smoothing:antialiased;
 }
 .app-shell{display:flex;min-height:100vh;max-width:1400px;margin:24px auto;padding:12px;gap:16px}
 .sidebar{width:260px;background:linear-gradient(180deg,var(--panel),rgba(8,14,22,0.6));border-radius:14px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
@@ -38,7 +40,7 @@ body{
 
 .main{flex:1;display:flex;flex-direction:column;gap:12px}
 .topbar{height:56px;display:flex;align-items:center;justify-content:space-between;background:transparent;padding:6px 12px}
-.topbar .search input{padding:10px 12px;border-radius:10px;border:0;background:var(--glass);color:var(--muted);min-width:240px}
+.topbar .search input{padding:10px 12px;border-radius:10px;border:0;background:var(--glass);color:var(--text);min-width:240px}
 .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:10px;border:0;font-weight:600;cursor:pointer}
 .btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.06);color:var(--muted)}
 .btn.small{padding:6px 8px;font-size:0.9rem}
@@ -52,8 +54,29 @@ body{
 .muted{color:var(--muted);margin-bottom:8px}
 .small{font-size:0.85rem}
 .form-row{display:flex;gap:8px;margin-top:12px}
-input,textarea,select{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:#dbeafe;padding:10px;border-radius:10px}
-select option{color:#0f1724;background:#ffffff}
+input,textarea{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--text);padding:10px;border-radius:10px;font-family:inherit}
+
+select{appearance:auto; -webkit-appearance:auto; -moz-appearance:auto; padding-right:32px; color: var(--text); background: var(--card-light)}
+select option{color: var(--text); background: var(--card-light)}
+
+/* Specific dropdown / select styling for layout (use site text color for visibility) */
+select, .form-select, .loop-field-select, .two-col select, .data-tree select { 
+  font-family: inherit; 
+  color: var(--text); 
+  background: var(--card-light); 
+  border: 1px solid rgba(255,255,255,0.04); 
+  padding: 8px 10px; 
+  border-radius: 8px; 
+}
+
+/* Option styling */
+select option, .form-select option { color: var(--text); background: var(--card-light) }
+
+/* Best-effort hover/highlight for options (may be browser-limited) */
+select option:hover, .form-select option:hover { background: rgba(255,255,255,0.04); }
+
+/* Improve dropdown focus/active state for accessibility */
+select:focus, .form-select:focus, .loop-field-select:focus { outline: 2px solid rgba(79,70,229,0.18); box-shadow: 0 4px 14px rgba(79,70,229,0.06); }
 .two-col{display:flex;gap:8px}
 .divider{height:1px;background:rgba(255,255,255,0.03);margin:12px 0;border-radius:2px}
 .list{display:flex;flex-direction:column;gap:8px}
@@ -61,15 +84,26 @@ select option{color:#0f1724;background:#ffffff}
 .list .item .meta{color:var(--muted);font-size:0.9rem}
 .preview-wrap{height:var(--viewer-height);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);margin-top:8px}
 .preview-wrap iframe{width:100%;height:100%;border:0;background:white}
-
 /* Ensure readable text when editing or previewing content on light/white backgrounds.
   Use the .light-bg helper class on elements that contain white/light backgrounds.
   This keeps the dark chrome while forcing dark text only inside these light areas. */
 .light-bg, .light-bg * { color: #0f1724 !important; }
+/* Ensure form controls inside light backgrounds are clearly readable (override inline styles) */
+.light-bg input, .light-bg textarea, .light-bg select { color: #0f1724 !important; }
 .preview-wrap iframe{ background: white !important }
 
 /* Editor and palette share the same visual height */
 #pageEditor{height:var(--viewer-height);min-height:220px}
+
+/* Modal card used for create site and similar dialogs */
+.modal-card{background:var(--modal-bg);color:var(--modal-fg);border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.35);}
+.modal-card .muted{color:rgba(230,238,248,0.78)}
+.modal-input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);margin-bottom:12px;background:transparent;color:var(--modal-fg)}
+
+/* Improve overall typography contrast */
+h1,h2,h3,h4,h5{color:var(--text)}
+label, .muted, .small{color:var(--muted)}
+
 
 .palette-item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px;cursor:grab}
 .palette-item:active{cursor:grabbing}
@@ -121,9 +155,12 @@ select option{color:#0f1724;background:#ffffff}
 /* Loop Builder UI */
 .loop-builder{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
 .loop-builder .loop-preview{color:var(--muted);margin-top:6px}
-.loop-builder select.loop-field-select{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#dbeafe;padding:8px;border-radius:6px}
+.loop-builder select.loop-field-select{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);padding:8px;border-radius:6px}
 
 code{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px}
+
+/* API response preformatted block (visible on dark backgrounds) */
+.api-body-pre{white-space:pre-wrap;color:var(--text);background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;}
 
 @media (max-width:900px){
   .app-shell{flex-direction:column;padding:12px}
@@ -136,5 +173,22 @@ code{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px}
 small.muted{color:var(--muted);font-size:0.85rem}
 
 /* Guided tour (Intro.js) removed — related styles deleted to avoid loading unused css. */
+
+/*
+  GrapesJS editor should use its own theme and default styling. The admin theme
+  applied broad overrides that may force light text on white backgrounds inside
+  the editor. Reset/avoid admin chrome inside `#gjs` so GrapesJS can render its
+  normal theme (visible dark text on white backgrounds).
+*/
+/* Reset common properties inside the GrapesJS root container */
+#gjs, #gjs * {
+  color: initial !important;
+  background: initial !important;
+  border-color: initial !important;
+}
+
+/* Ensure form controls inside GrapesJS panels use normal colors (tools/panels) */
+#gjs input, #gjs textarea, #gjs select { color: initial !important; background: initial !important }
+
 
 

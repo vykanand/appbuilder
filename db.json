@@ -16,6 +16,14 @@
           "headers": {},
           "params": {},
           "bodyTemplate": null
+        },
+        {
+          "name": "submituser",
+          "url": "https://jsonplaceholder.typicode.com/users",
+          "method": "POST",
+          "headers": {},
+          "params": {},
+          "bodyTemplate": "{\n  \"name\": \"Vikas\",\n  \"email\": \"vikas@example.com\"\n}\n"
         }
       ],
       "mappings": [

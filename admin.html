@@ -16,17 +16,30 @@
           <div>
             <div class="title">AppBuilder</div>
             <div class="subtitle">No-code site integrations</div>
+
+      <!-- Create Site Modal -->
+      <div id="createSiteModal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;background:rgba(2,6,23,0.45)">
+        <div class="modal-card" style="max-width:520px;width:100%;padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-weight:700;font-size:1.05rem">Create New Site</div>
+            <button id="createSiteModalClose" class="btn ghost">Close</button>
+          </div>
+          <div class="muted" style="margin-bottom:10px">Enter a short name for the site (used as the folder name / route).</div>
+          <input id="modalSiteNameInput" placeholder="site-name" class="modal-input" />
+          <div style="display:flex;justify-content:flex-end;gap:8px">
+            <button id="createSiteModalCreate" class="btn">Create</button>
+            <button id="createSiteModalCancel" class="btn ghost">Cancel</button>
+          </div>
+        </div>
+      </div>
           </div>
         </div>
 
         <div class="sidebar-section">
           <div class="section-title">Sites</div>
           <ul id="siteList" class="site-list" data-intro="List of your managed sites. Click to open."></ul>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input id="siteNameInput" placeholder="site-name" style="flex:1" />
-            <button id="createSiteBtn" class="btn">Create</button>
-          </div>
-          <button id="newSiteBtn" class="btn ghost" style="margin-top:8px">+ New site</button>
+       
+          <button id="createSiteBtn" class="btn ghost" style="margin-top:8px">+ New site</button>
         </div>
 
         
@@ -50,7 +63,7 @@
                 <div class="muted">Browse the selected website's folder and files. Click a file to open it in the editor.</div>
                 <div id="siteFileTree" style="margin-top:10px;max-height:360px;overflow:auto;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px"></div>
                 <div style="display:flex;gap:8px;margin-top:8px">
-                  <input id="newPageNameInput" placeholder="new-page.html" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#dbeafe" />
+                  <input id="newPageNameInput" placeholder="new-page.html" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent" />
                   <button id="createPageBtn" class="btn small">Create Page</button>
                 </div>
                 <div id="siteActions" class="muted small" style="margin-top:8px"></div>
@@ -63,7 +76,7 @@
                 <input id="apiNameInput" placeholder="API name (identifier)" />
                 <input id="apiUrlInput" placeholder="https://api.example.com/endpoint" />
                 <div class="two-col">
-                  <select id="apiMethodSelect" style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:#dbeafe">
+                  <select id="apiMethodSelect" style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);">
                     <option value="GET" selected>GET</option>
                     <option value="POST">POST</option>
                     <option value="PUT">PUT</option>
@@ -129,7 +142,7 @@
                   <button id="closeVisualBtn" class="btn ghost">Close</button>
                 </div>
               </div>
-              <div id="gjs" class="light-bg" style="height:80%;background:#fff"></div>
+                  <div id="gjs" style="height:80%"></div>
             </div>
           </div>
         </div>

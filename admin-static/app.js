@@ -250,7 +250,7 @@ async function testApi(apiDef){
     AppUtils.Loader.hide();
     let body;
     try{ body = await resp.json(); }catch(e){ body = await resp.text(); }
-    const html = `<div style="max-height:60vh;overflow:auto"><pre style="white-space:pre-wrap;color:#dbeafe">${escapeHtml(typeof body === 'string' ? body : JSON.stringify(body, null, 2))}</pre></div>`;
+      const html = `<div style="max-height:60vh;overflow:auto"><pre class="api-body-pre">${escapeHtml(typeof body === 'string' ? body : JSON.stringify(body, null, 2))}</pre></div>`;
     AppUtils.Modal.show({ title: `Endpoint: ${apiDef.name} — status ${resp.status}`, body: html });
     console.log('endpoint execute result', body);
   }catch(err){ AppUtils.Loader.hide(); console.error(err); AppUtils.Modal.show({ title: 'Error', body: escapeHtml(err.message || String(err)) }); }
@@ -332,11 +332,30 @@ function renderDataPalette(data){
   }
 }
 
-// Create site
-const createBtn = qs('#createSiteBtn'); if(createBtn) createBtn.addEventListener('click', async ()=>{ const name = qs('#siteNameInput').value.trim(); if(!name){ showMessage('Enter site name','Input required'); return; } await fetch('/api/sites', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})}); qs('#siteNameInput').value = ''; await loadSites(); });
+// Create site — open modal from button, modal handles creation
+const createBtn = qs('#createSiteBtn');
+const createModal = qs('#createSiteModal');
+const modalInput = qs('#modalSiteNameInput');
+const modalCreate = qs('#createSiteModalCreate');
+const modalCancel = qs('#createSiteModalCancel');
+const modalClose = qs('#createSiteModalClose');
+if(createBtn){ createBtn.addEventListener('click', ()=>{ if(createModal) { createModal.style.display = 'flex'; setTimeout(()=>{ try{ modalInput && modalInput.focus(); }catch(e){} },50); } }); }
+if(modalCancel) modalCancel.addEventListener('click', ()=>{ if(createModal) createModal.style.display = 'none'; });
+if(modalClose) modalClose.addEventListener('click', ()=>{ if(createModal) createModal.style.display = 'none'; });
+if(modalCreate) modalCreate.addEventListener('click', async ()=>{
+  try{
+    const name = modalInput && modalInput.value && modalInput.value.trim();
+    if(!name){ showMessage('Enter site name','Input required'); return; }
+    await fetch('/api/sites', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});
+    if(modalInput) modalInput.value = '';
+    if(createModal) createModal.style.display = 'none';
+    await loadSites();
+    try{ await selectSite(name); }catch(e){}
+    showMessage('Created site: ' + name, 'Saved');
+  }catch(err){ console.error(err); showMessage('Could not create site','Error'); }
+});
 
-// New site quick button
-const newSiteBtn = qs('#newSiteBtn'); if(newSiteBtn) newSiteBtn.addEventListener('click', ()=> qs('#siteNameInput').focus());
+// Removed redundant newSiteBtn handler — Create Site button opens the modal
 
 // Create new HTML page for selected site with demo content
 const createPageBtn = qs('#createPageBtn'); if(createPageBtn) createPageBtn.addEventListener('click', async ()=>{
@@ -370,7 +389,7 @@ const addApiBtn = qs('#addApiBtn'); if(addApiBtn) addApiBtn.addEventListener('cl
 // manual mapping UI removed — mappings are created automatically from palette drops and visual editor bindings
 
 // Test endpoint execution for APIs (delegated)
-const apiListEl = qs('#apiList'); if(apiListEl) apiListEl.addEventListener('click', async (e)=>{ const btn = e.target.closest('button'); if(!btn || !btn.dataset.api) return; const apiName = btn.dataset.api; if(!selectedSite) { showMessage('Select a site first','Error'); return; } try{ AppUtils.Loader.show('Testing API...'); const resp = await fetch(`/api/sites/${selectedSite.name}/endpoints/${encodeURIComponent(apiName)}/execute`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}); AppUtils.Loader.hide(); let body; try{ body = await resp.json(); }catch(e){ body = await resp.text(); } AppUtils.Modal.show({ title:`Endpoint: ${apiName} — status ${resp.status}`, body: `<pre style="white-space:pre-wrap;color:#dbeafe">${escapeHtml(typeof body === 'string' ? body : JSON.stringify(body, null, 2))}</pre>` }); console.log('endpoint execute result', body); }catch(err){ AppUtils.Loader.hide(); console.error(err); AppUtils.Modal.show({ title:'Error', body: escapeHtml(err.message || String(err)) }); } });
+const apiListEl = qs('#apiList'); if(apiListEl) apiListEl.addEventListener('click', async (e)=>{ const btn = e.target.closest('button'); if(!btn || !btn.dataset.api) return; const apiName = btn.dataset.api; if(!selectedSite) { showMessage('Select a site first','Error'); return; } try{ AppUtils.Loader.show('Testing API...'); const resp = await fetch(`/api/sites/${selectedSite.name}/endpoints/${encodeURIComponent(apiName)}/execute`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}); AppUtils.Loader.hide(); let body; try{ body = await resp.json(); }catch(e){ body = await resp.text(); } AppUtils.Modal.show({ title:`Endpoint: ${apiName} — status ${resp.status}`, body: `<pre class="api-body-pre">${escapeHtml(typeof body === 'string' ? body : JSON.stringify(body, null, 2))}</pre>` }); console.log('endpoint execute result', body); }catch(err){ AppUtils.Loader.hide(); console.error(err); AppUtils.Modal.show({ title:'Error', body: escapeHtml(err.message || String(err)) }); } });
 
 // Pages editor handlers
 const loadPageBtn = qs('#loadPageBtn'); if(loadPageBtn) loadPageBtn.addEventListener('click', async ()=>{ if(!selectedSite) { showMessage('Select a site first','Error'); return; } const path = qs('#pageSelect').value; if(!path){ showMessage('Pick a page','Input required'); return; } try{ const content = await api(`/api/sites/${selectedSite.name}/pages/content?path=${encodeURIComponent(path)}`); qs('#pageEditor').value = content; }catch(e){ showMessage('Could not load page', 'Error'); console.error(e); } });
