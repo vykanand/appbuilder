@@ -46,6 +46,18 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(ROOT, 'admin.html'));
 });
 
+// Serve any HTML file in root directory dynamically by filename (e.g. /rest-client -> rest-client.html)
+app.get('/:page', (req, res, next) => {
+  const page = req.params.page;
+  // Only allow .html files in root, block directory traversal
+  if (!/^[\w\-]+$/.test(page)) return res.status(400).send('Invalid page name');
+  const filePath = path.join(ROOT, `${page}.html`);
+  fs.access(filePath, fs.constants.F_OK, err => {
+    if (err) return next(); // fallback to other routes if not found
+    res.sendFile(filePath);
+  });
+});
+
 // Serve static admin assets if present
 app.use('/admin-static', express.static(path.join(ROOT, 'admin-static')));
 
@@ -100,6 +112,8 @@ app.post('/api/sites', (req, res) => {
   const db = readDB();
   if (db.sites.find(s => s.name === name)) return res.status(400).json({ error: 'site exists' });
   const site = { name, apis: [], mappings: [] };
+  // actions store button/form-driven actions persisted per site
+  site.actions = [];
   db.sites.push(site);
   // ensure website folder
   const siteFolder = path.join(WEBSITES_DIR, name);
@@ -171,6 +185,40 @@ app.post('/api/sites/:siteName/apis', (req, res) => {
   res.json(api);
 });
 
+// Update an existing API definition (allow updating mapping configuration and bodyTemplate)
+app.put('/api/sites/:siteName/apis/:apiName', (req, res) => {
+  const siteName = req.params.siteName;
+  const apiName = req.params.apiName;
+  const db = readDB();
+  const s = db.sites.find(x => x.name === siteName);
+  if (!s) return res.status(404).json({ error: 'site not found' });
+  const api = s.apis.find(a => a.name === apiName);
+  if (!api) return res.status(404).json({ error: 'api not found' });
+  const { url, method, headers, params, bodyTemplate, mappingConfig } = req.body;
+  if (url !== undefined) api.url = url;
+  if (method !== undefined) api.method = method;
+  if (headers !== undefined) api.headers = headers;
+  if (params !== undefined) api.params = params;
+  if (bodyTemplate !== undefined) api.bodyTemplate = bodyTemplate;
+  if (mappingConfig !== undefined) api.mappingConfig = mappingConfig;
+  writeDB(db);
+  res.json(api);
+});
+
+// Persist UI-driven actions (button/form -> API mappings)
+app.post('/api/sites/:siteName/actions', (req, res) => {
+  const { selector, apiName, method, fields, page } = req.body || {};
+  if (!selector || !apiName) return res.status(400).json({ error: 'selector and apiName required' });
+  const db = readDB();
+  const s = db.sites.find(x => x.name === req.params.siteName);
+  if (!s) return res.status(404).json({ error: 'site not found' });
+  s.actions = s.actions || [];
+  const action = { id: 'action_' + Date.now().toString(36), selector, apiName, method: method || 'POST', fields: fields || [], page: page || null };
+  s.actions.push(action);
+  writeDB(db);
+  res.json(action);
+});
+
 app.post('/api/sites/:siteName/mappings', (req, res) => {
   const { placeholder, apiName, jsonPath, pages } = req.body;
   if (!placeholder || !apiName || !jsonPath) return res.status(400).json({ error: 'placeholder, apiName, jsonPath required' });
@@ -221,12 +269,15 @@ app.get('/api/sites/:siteName/data', async (req, res) => {
 // Helper: fetch all APIs for site (simple, no auth caching)
 async function fetchAPIsForSite(site) {
   const results = {};
+  results.__meta__ = {};
   for (const api of site.apis) {
     try {
       const resp = await axios({ method: api.method || 'GET', url: api.url, headers: api.headers || {}, params: api.params || {}, data: api.bodyTemplate || undefined });
       results[api.name] = resp.data;
+      results.__meta__[api.name] = { method: (api.method || 'GET').toUpperCase(), status: resp.status, url: api.url };
     } catch (err) {
       results[api.name] = { _error: String(err.message) };
+      results.__meta__[api.name] = { method: (api.method || 'GET').toUpperCase(), status: 'error', url: api.url };
     }
   }
   return results;
@@ -280,6 +331,18 @@ app.get('/site/:siteName/*', async (req, res) => {
     const val = get(apiData, key, '');
     return (val === undefined || val === null) ? '' : String(val);
   });
+
+  // Inject action wiring for buttons/forms if site.actions exist
+  try{
+    const actions = (site && site.actions) ? (site.actions.filter(a => !a.page || a.page === relPath)) : [];
+    if(actions && actions.length>0){
+      const safe = JSON.stringify(actions).replace(/</g,'\\u003c');
+      const script = `\n<script>/* AppBuilder action bindings */(function(actions, siteName){try{actions.forEach(function(a){try{var els = document.querySelectorAll(a.selector||''); if(!els) return; els.forEach(function(el){ if(el.__ab_action_bound) return; el.__ab_action_bound = true; el.addEventListener('click', async function(ev){ try{ ev.preventDefault(); var body = {}; (a.fields||[]).forEach(function(f){ try{ var inp = document.querySelector('[name="'+f+'"]') || document.querySelector('[data-field="'+f+'"]') || document.getElementById(f); body[f] = inp ? (inp.value || inp.textContent || '') : ''; }catch(e){} }); await fetch('/api/sites/'+encodeURIComponent(siteName)+'/endpoints/'+encodeURIComponent(a.apiName)+'/execute', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ body: body }) }); }catch(e){ console && console.error && console.error(e); } }); }); }catch(e){} });}catch(e){console && console.error && console.error(e);} })(` + safe + `, ${JSON.stringify(siteName)});</script>\n`;
+      // append before closing body if present, else at end
+      if(content.lastIndexOf('</body>')!==-1){ content = content.replace(/<\/body>\s*$/i, script + '</body>'); }
+      else { content = content + script; }
+    }
+  }catch(e){ logger.error(e); }
 
   res.set('Content-Type', 'text/html');
   res.send(content);

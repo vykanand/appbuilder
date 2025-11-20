@@ -5,11 +5,11 @@
     <title>Demo Site</title>
   </head>
   <body>
-    <h1>Welcome to demo site {{userApi.address.suite}}</h1>
+    <h1>Welcome to demo site</h1>
     <p>User name from API: <strong>{{username}}</strong> you live here : {{userApi.address.street}}</p>    
      <p> {{userApi.address}} </p>
 Name - <p> {{userApi.name}} </p> 
-
+Addr - {{userApi.address.suite}}
 {{#each userApi}}
 <!-- LOOP_START:loop_mi7er0yf_rdc8pi:userApi -->
   <div class="loop-item">
@@ -20,20 +20,56 @@ Name - <p> {{userApi.name}} </p>
 <!-- LOOP_END:loop_mi7er0yf_rdc8pi -->
 {{/each}}
 Company - {{userApi.company.name}}
+{{submituser}}
 
-
-<p>User list</p>
-
-{{#each userlist}}
-================
-  <div class="loop-item">
-<br>Name {{this.name}}
-<br>Email {{this.email}}
-<br>Phone {{userlist.phone}}{{this.website}}
-<br><br>
-  </div>
-================
-{{/each}}
-
-  </body>
-</html>
+<form id="abform_mi7mhx6z_3ll9" style="padding:12px;border:1px solid #ddd;border-radius:8px;margin:8px 0">
+  <h3>POST submituser</h3>
+  <label>{
+  "name": "Vikas",
+  "email": "vikas@example.com"
+}
+: <input type="text" name="{
+  "name": "Vikas",
+  "email": "vikas@example.com"
+}
+" data-field="{
+  "name": "Vikas",
+  "email": "vikas@example.com"
+}
+"></label><br>
+<label>id: <input type="number" name="id" data-field="id"></label><br>
+  <button type="submit">Submit</button>
+</form>
+<script>
+document.getElementById('abform_mi7mhx6z_3ll9').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var data = {};
+  this.querySelectorAll('input, textarea, select').forEach(function(inp){
+    var field = inp.getAttribute('data-field') || inp.name;
+    if(!field) return;
+    if(inp.type === 'checkbox') data[field] = inp.checked; else data[field] = inp.value;
+  });
+  try{
+    var headers = {};
+    var bodyPayload = null;
+    if('application/json' === 'application/x-www-form-urlencoded'){
+      var params = new URLSearchParams();
+      Object.keys(data).forEach(function(k){ params.append(k, data[k]); });
+      bodyPayload = params.toString(); headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    } else {
+      // default to JSON
+      bodyPayload = JSON.stringify({ body: data }); headers['Content-Type'] = 'application/json';
+    }
+    var resp = await fetch('/api/sites/demo/endpoints/submituser/execute', {
+      method: 'POST',
+      headers: headers,
+      body: bodyPayload
+    });
+    var result = await resp.json();
+    alert('Success: ' + JSON.stringify(result));
+    this.reset();
+  }catch(err){
+    alert('Error: ' + err.message);
+  }
+});
+</script>

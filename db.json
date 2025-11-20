@@ -23,7 +23,22 @@
           "method": "POST",
           "headers": {},
           "params": {},
-          "bodyTemplate": "{\n  \"name\": \"Vikas\",\n  \"email\": \"vikas@example.com\"\n}\n"
+          "bodyTemplate": "{\n  \"name\": \"Vikas\",\n  \"email\": \"vikas@example.com\"\n}\n",
+          "mappingConfig": {
+            "contentType": "application/json",
+            "fieldMappings": [
+              {
+                "responsePath": "{\n  ",
+                "requestField": "{",
+                "location": "body"
+              },
+              {
+                "responsePath": "id",
+                "requestField": "id",
+                "location": "body"
+              }
+            ]
+          }
         }
       ],
       "mappings": [
@@ -33,6 +48,34 @@
           "jsonPath": "name"
         }
       ]
+    },
+    {
+      "name": "test-api-site",
+      "apis": [
+        {
+          "name": "get-usershttps://jsonplaceholder.typicode.com/usersget-users",
+          "url": "https://jsonplaceholder.typicode.com/users",
+          "method": "GET",
+          "headers": {},
+          "params": {},
+          "bodyTemplate": null
+        },
+        {
+          "name": "create-user",
+          "url": "https://jsonplaceholder.typicode.com/users",
+          "method": "POST",
+          "headers": {},
+          "params": {},
+          "bodyTemplate": null,
+          "mappingConfig": {
+            "contentType": "application/json",
+            "fieldMappings": [],
+            "rawBodyTemplate": "{\n  \"id\": 11\n}"
+          }
+        }
+      ],
+      "mappings": [],
+      "actions": []
     }
   ]
 }

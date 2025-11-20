@@ -133,6 +133,37 @@ label, .muted, .small{color:var(--muted)}
 /* value badges */
 .node-value-badge{margin-left:auto;padding:6px 10px;border-radius:999px;font-weight:800;font-size:0.86rem;background:linear-gradient(90deg,#fff7cc,#fff1b8);color:#5a3b00;border:1px solid rgba(255,255,255,0.06)}
 
+/* Method badge for APIs in palette */
+.node-method-badge{margin-left:auto;padding:6px 8px;border-radius:999px;font-weight:700;font-size:0.78rem;color:#071022;border:1px solid rgba(0,0,0,0.06)}
+.node-method-badge.method-create{background:linear-gradient(90deg,#fecaca,#f87171);color:#3b0b0b;border:1px solid rgba(139,31,31,0.12)}
+.node-method-badge.method-fetch{background:linear-gradient(90deg,#bbf7d0,#86efac);color:#04260f;border:1px solid rgba(6,95,70,0.08)}
+
+/* inline method label next to API key in palette */
+.method-inline{font-size:0.8rem;display:inline-block}
+
+/* API info button in palette */
+.btn-icon-mini{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:2px 6px;border-radius:6px;cursor:pointer;font-size:0.9rem;margin-left:8px}
+.btn-icon-mini:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+
+/* API details panel */
+.api-details-panel{max-height:70vh;overflow:auto}
+.detail-section{margin-bottom:20px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px}
+.detail-section h4{margin:0 0 10px 0;font-size:1rem;color:var(--accent-2)}
+.detail-row{margin-bottom:8px;line-height:1.6}
+.detail-row strong{color:var(--text);margin-right:8px}
+.detail-table{width:100%;border-collapse:collapse;margin-top:8px}
+.detail-table th,.detail-table td{text-align:left;padding:8px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.detail-table th{background:rgba(255,255,255,0.02);font-weight:600;color:var(--accent-2)}
+.detail-table code{background:rgba(255,255,255,0.04);padding:2px 6px;border-radius:4px;font-size:0.9rem}
+.hint-list{list-style:none;padding-left:0;margin:8px 0}
+.hint-list li{padding:6px 0;border-left:3px solid var(--accent);padding-left:10px;margin-bottom:6px;background:rgba(79,70,229,0.04);border-radius:4px}
+.hint-list strong{color:var(--accent-2)}
+
+/* API list method badge */
+.api-method-badge{margin-left:8px;padding:4px 8px;border-radius:8px;font-weight:700;font-size:0.78rem;vertical-align:middle}
+.api-method-badge.method-create{background:linear-gradient(90deg,#fee2e2,#fecaca);color:#4a0b0b;border:1px solid rgba(139,31,31,0.08)}
+.api-method-badge.method-fetch{background:linear-gradient(90deg,#dcfce7,#bbf7d0);color:#07340f;border:1px solid rgba(6,95,70,0.06)}
+
 .node-children{margin-left:18px;border-left:1px dashed rgba(255,255,255,0.02);padding-left:10px;margin-top:6px}
 .loop-item{padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.04);background:rgba(255,255,255,0.015);margin:6px 0}
 
@@ -189,6 +220,97 @@ small.muted{color:var(--muted);font-size:0.85rem}
 
 /* Ensure form controls inside GrapesJS panels use normal colors (tools/panels) */
 #gjs input, #gjs textarea, #gjs select { color: initial !important; background: initial !important }
+
+/* Live validation error styling */
+.validation-error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  display: block;
+  font-weight: 600;
+}
+
+/* Field mapper panel */
+.field-mapper-panel .mapper-section {
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.field-mapper-panel .mapper-item {
+  transition: transform 0.2s ease;
+}
+
+.field-mapper-panel .mapper-item:hover {
+  transform: translateX(4px);
+}
+
+/* Component library patterns */
+.crud-table-component table {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.crud-table-component .btn-edit {
+  background: #3b82f6;
+  color: white;
+  border: 0;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.crud-table-component .btn-delete {
+  background: #ef4444;
+  color: white;
+  border: 0;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-left: 4px;
+}
+
+.search-form input:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.filter-panel select {
+  cursor: pointer;
+}
+
+.filter-panel select:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+/* Enhanced GrapesJS block categories */
+.gjs-block-category {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.gjs-block {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gjs-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
 
 

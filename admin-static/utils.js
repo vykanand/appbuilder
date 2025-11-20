@@ -14,19 +14,29 @@
     const dlg = document.createElement('div');
     dlg.className = 'ab-modal';
     dlg.style.cssText = 'background:linear-gradient(180deg,#071022,#0b1424);color:#e6eef8;padding:16px;border-radius:12px;max-width:900px;width:90%;max-height:80%;overflow:auto;box-shadow:0 10px 30px rgba(2,6,23,0.7)';
+    // content and footer are kept as persistent children so we can update body/title without rebuilding the whole dialog
+    const titleEl = document.createElement('div'); titleEl.style.cssText='font-weight:700;margin-bottom:8px;';
+    const content = document.createElement('div');
+    const footer = document.createElement('div'); footer.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:12px';
+    dlg.appendChild(titleEl);
+    dlg.appendChild(content);
+    dlg.appendChild(footer);
     overlay.appendChild(dlg);
     document.body.appendChild(overlay);
 
+    function clearFooter(){ footer.innerHTML = ''; }
+
     function show(opts){
-      dlg.innerHTML = '';
-      if(opts.title){ const h = document.createElement('div'); h.style.cssText='font-weight:700;margin-bottom:8px'; h.textContent = opts.title; dlg.appendChild(h); }
-      const content = document.createElement('div');
-      // support multiple content keys for compatibility: body, html, text
+      // title
+      titleEl.textContent = opts.title || '';
+      // content: support multiple content keys for compatibility: body, html, text
+      content.innerHTML = '';
       if(opts.body){ content.innerHTML = opts.body; }
       else if(opts.html){ content.innerHTML = opts.html; }
       else if(opts.text){ const pre = document.createElement('pre'); pre.className = 'api-body-pre'; pre.textContent = opts.text; content.appendChild(pre); }
-      dlg.appendChild(content);
-      const footer = document.createElement('div'); footer.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:12px';
+
+      // footer buttons
+      clearFooter();
       if(opts.buttons && Array.isArray(opts.buttons)){
         for(const b of opts.buttons){
           const btn = document.createElement('button'); btn.className='btn'; btn.textContent = b.label || 'OK';
@@ -37,13 +47,25 @@
       } else {
         const ok = document.createElement('button'); ok.className='btn'; ok.textContent='Close'; ok.onclick = hide; footer.appendChild(ok);
       }
-      dlg.appendChild(footer);
+
       overlay.style.display = 'flex';
     }
 
     function hide(){ overlay.style.display = 'none'; }
 
-    return { show, hide, el: overlay };
+    function updateBody(newBody){
+      // Accept either HTML string or DOM node
+      if(typeof newBody === 'string'){
+        content.innerHTML = newBody;
+      } else if(newBody instanceof Node){
+        content.innerHTML = '';
+        content.appendChild(newBody);
+      }
+    }
+
+    function updateTitle(newTitle){ titleEl.textContent = newTitle || ''; }
+
+    return { show, hide, updateBody, updateTitle, el: overlay };
   }
 
   function createLoader(){
