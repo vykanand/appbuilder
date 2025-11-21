@@ -15,6 +15,7 @@ const DB_FILE = path.join(ROOT, 'db.json');
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '1mb' }));
+// Provide the `extended` option to urlencoded to avoid deprecation warnings
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // logging
@@ -44,6 +45,22 @@ function writeDB(db) {
 // Serve admin UI
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(ROOT, 'admin.html'));
+});
+
+// Serve favicon for main app
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(ROOT, 'favicon.ico'));
+});
+
+// Serve favicon for individual sites (dynamic from their root folder, fallback to main)
+app.get('/site/:siteName/favicon.ico', (req, res) => {
+  const siteName = req.params.siteName;
+  const siteFavicon = path.join(WEBSITES_DIR, siteName, 'favicon.ico');
+  if (fs.existsSync(siteFavicon)) {
+    res.sendFile(siteFavicon);
+  } else {
+    res.sendFile(path.join(ROOT, 'favicon.ico'));
+  }
 });
 
 // Serve any HTML file in root directory dynamically by filename (e.g. /rest-client -> rest-client.html)
@@ -283,6 +300,17 @@ async function fetchAPIsForSite(site) {
   return results;
 }
 
+// Serve all files for a site dynamically from root folder (no processing)
+app.get('/website/:siteName/*', (req, res) => {
+  const siteName = req.params.siteName;
+  const relPath = req.params[0];
+  // sanitize path
+  if (relPath.includes('..')) return res.status(400).send('Invalid path');
+  const filePath = path.join(WEBSITES_DIR, siteName, relPath);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Not found');
+  res.sendFile(filePath);
+});
+
 // Serve website files with injection for .html only
 app.get('/site/:siteName/*', async (req, res) => {
   const siteName = req.params.siteName;
@@ -376,5 +404,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  logger.info(`AppBuilder prototype running on http://localhost:${PORT}`);
+  logger.info(`AppBuilder running on http://localhost:${PORT}`);
 });

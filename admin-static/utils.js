@@ -90,7 +90,7 @@
     wrap.style.cssText = 'position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:13000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;max-width:90%;';
     document.body.appendChild(wrap);
 
-    function show(type, message, opts={timeout:3500}){
+    function show(type, message, opts={timeout:5000}){
       try{
         const n = document.createElement('div'); n.className = `ab-notify ab-notify-${type}`; n.style.cssText = 'pointer-events:auto;min-width:280px;max-width:720px;padding:10px 14px;border-radius:8px;box-shadow:0 8px 24px rgba(2,6,23,0.6);display:flex;justify-content:space-between;gap:12px;align-items:center';
         const txt = document.createElement('div'); txt.innerHTML = message;

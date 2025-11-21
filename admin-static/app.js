@@ -69,470 +69,221 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Store last request/response from REST client for drag-and-drop
-  window.lastRestClientData = {};
-  window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'rest-client-result') {
-      window.lastRestClientData = event.data;
-    }
-  });
-
-  // Update drag-and-drop logic to use lastRestClientData
-  const editorEl = qs('#pageEditor');
-  if(editorEl){
-    editorEl.addEventListener('drop', async (e)=>{
-      e.preventDefault();
-      // Use lastRestClientData for stitching
-      const data = window.lastRestClientData;
-      if (data && data.response) {
-        const start = editorEl.selectionStart || 0;
-        const val = editorEl.value;
-        // Insert response field mapping (example: {{response.key}})
-        let insertText = '';
-        if (typeof data.response === 'object') {
-          const keys = Object.keys(data.response);
-          insertText = keys.map(k => `{{response.${k}}}`).join(' ');
-        } else {
-          insertText = `{{response}}`;
-        }
-        editorEl.value = val.slice(0, start) + insertText + val.slice(start);
-        editorEl.focus();
-        showMessage('Inserted response mapping from REST client.', 'Mapping inserted');
-      }
-    });
-  }
-});
-const qs = (s, el=document) => el.querySelector(s);
-const qsa = (s, el=document) => Array.from(el.querySelectorAll(s));
-
-// Top-level state
-let sites = [];
-let selectedSite = null;
-let latestAggregatedData = {};
-const apiSampleCache = {};
-
-// Utility: escape text included in HTML to avoid markup injection
-function escapeHtml(s){
-  if(s === null || s === undefined) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-// If AppUtils.Logger is available (utils.js loads before this), wire console methods to it
-if(window.AppUtils && AppUtils.Logger){
-  const L = AppUtils.Logger;
-  console.log = (...a)=> L.log(...a);
-  console.info = (...a)=> L.info(...a);
-}
-
-// Helper: generate API form HTML for forms inserted into pages or the visual editor
-function showMessage(text, title = 'Notice'){
-  // Prefer top-bar notifications for non-blocking UX when available
-  try{
-    if(window.AppUtils && AppUtils.Notify){
-      const t = (title||'').toLowerCase();
-      if(t.includes('error') || t.includes('invalid')) return AppUtils.Notify.error(escapeHtml(text));
-      if(t.includes('saved') || t.includes('bound') || t.includes('success')) return AppUtils.Notify.success(escapeHtml(text));
-      return AppUtils.Notify.info(escapeHtml(text));
-    }
-  }catch(e){ /* ignore and fallback */ }
-
-  // fallback to modal if available, else alert
-  if(window.AppUtils && AppUtils.Modal){
-    AppUtils.Modal.show({ title, body: escapeHtml(text) });
-  } else {
-    alert(text);
-  }
-}
-
-// NOTE: Preview injection removed — live preview should show the original page without admin styling.
-
-async function api(path, options={}){
-  const res = await fetch(path, options);
-  const ct = (res.headers.get('content-type')||'').toLowerCase();
-  const result = { status: res.status, headers: res.headers };
-  if(ct.includes('application/json')){
-    result.body = await res.json();
-  } else {
-    result.body = await res.text();
-  }
-  // return a small wrapper to keep previous usage where api(...) returned body directly
-  return result.body;
-}
-
-async function loadSites(){
-  try{ sites = await api('/api/sites') || []; }catch(e){ console.error(e); sites = []; }
-  await renderSiteList();
-  // auto-select first site if none selected to populate editor
-  if(!selectedSite && sites && sites.length>0){
-    await selectSite(sites[0].name);
-  }
-}
-
-async function renderSiteList(){
-  const ul = qs('#siteList'); if(!ul) return;
-  ul.innerHTML = '';
-  sites.forEach(s => {
-    const li = document.createElement('li');
-    li.textContent = s.name;
-    li.style.display = 'flex'; li.style.justifyContent = 'space-between'; li.style.alignItems = 'center';
-    // clicking the list item opens the site
-    li.addEventListener('click', ()=> selectSite(s.name));
-    if(selectedSite && selectedSite.name === s.name) li.classList.add('active');
-    ul.appendChild(li);
-  });
-}
-
-async function loadPageIntoEditor(path, siteName){
-  try{
-    const content = await api(`/api/sites/${siteName}/pages/content?path=${encodeURIComponent(path)}`);
-    const sel = qs('#pageSelect'); if(sel) sel.value = path;
-    const editor = qs('#pageEditor'); if(editor){ editor.value = content; }
-    const preview = qs('#previewFrame'); if(preview){ preview.src = `/site/${siteName}/${path}`; }
-  }catch(e){ showMessage('Could not load page content', 'Error'); console.error(e); }
-}
-
-async function selectSite(name){
-  selectedSite = await api(`/api/sites/${name}`) || null;
-  await renderSiteList();
-  await renderSiteDetails();
-}
-
-async function renderSiteDetails(){
-  if(!selectedSite) return;
-  qs('#siteActions').textContent = `Selected: ${selectedSite.name}`;
-  const apiList = qs('#apiList'); apiList.innerHTML='';
-  (selectedSite.apis||[]).forEach(a=>{
-    const div = document.createElement('div'); div.className='item';
-    const left = document.createElement('div');
-    const title = document.createElement('strong'); title.textContent = a.name;
-    const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = a.url;
-    const methodBadge = document.createElement('span'); methodBadge.className = 'api-method-badge';
-    const methodText = (a.method || 'GET').toUpperCase(); methodBadge.textContent = methodText;
-    if(['POST','PUT','PATCH','DELETE'].includes(methodText)) methodBadge.classList.add('method-create'); else methodBadge.classList.add('method-fetch');
-    // assemble left column: title, method badge, then url meta
-    left.appendChild(title);
-    left.appendChild(methodBadge);
-    left.appendChild(meta);
-    const right = document.createElement('div');
-    right.innerHTML = `<button class="btn small" data-api="${a.name}">Test</button> <button class="btn small outline" data-edit-api="${a.name}">Edit</button>`;
-    div.appendChild(left); div.appendChild(right);
-    apiList.appendChild(div);
-  });
-
-  // mappings are now auto-created from palette drops and visual editor bindings
-
-  const preview = qs('#previewFrame'); if(preview){ preview.src = `/site/${selectedSite.name}/`; }
-  const pl = qs('#previewLink'); if(pl) pl.href = `/site/${selectedSite.name}/`;
-  // (preview drop handling removed) drag->editor now creates forms for creation methods
-
-  try{
-    const pages = await api(`/api/sites/${selectedSite.name}/pages`);
-    const sel = qs('#pageSelect'); if(sel){ sel.innerHTML=''; pages.forEach(p=>{ const o = document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o); }); }
-    // auto-load first page if editor is empty
-    try{
-      const editor = qs('#pageEditor');
-      if(pages && pages.length>0 && editor && (!editor.value || editor.value.trim().length===0)){
-        await loadPageIntoEditor(pages[0], selectedSite.name);
-      }
-    }catch(e){ /* ignore */ }
-  }catch(e){ console.warn('could not load pages', e); }
-
-  // render full folder/file tree inside siteFileTree
-  try{
-    const tree = await api(`/api/sites/${selectedSite.name}/tree`);
-    const container = qs('#siteFileTree'); if(container){
-      container.innerHTML = '';
-      function renderNode(node, parentEl){
-        const nodeEl = document.createElement('div');
-        nodeEl.className = node.type === 'dir' ? 'fm-dir' : 'fm-file';
-        nodeEl.style.padding = '4px 6px';
-        nodeEl.style.cursor = 'pointer';
-        nodeEl.title = node.path;
-        if(node.type === 'dir'){
-          const label = document.createElement('div'); label.textContent = node.name; label.style.fontWeight='600';
-          const childrenWrap = document.createElement('div'); childrenWrap.style.marginLeft='12px'; childrenWrap.style.display = 'none';
-          label.onclick = (ev)=>{ ev.stopPropagation(); childrenWrap.style.display = childrenWrap.style.display === 'none' ? 'block' : 'none'; };
-          nodeEl.appendChild(label);
-          nodeEl.appendChild(childrenWrap);
-          (node.children||[]).forEach(ch=> renderNode(ch, childrenWrap));
-        } else {
-          nodeEl.textContent = node.name;
-          nodeEl.onclick = async (ev)=>{ ev.stopPropagation(); const sel = qs('#pageSelect'); if(sel) sel.value = node.path; await loadPageIntoEditor(node.path, selectedSite.name); };
-        }
-        parentEl.appendChild(nodeEl);
-      }
-      (tree||[]).forEach(n=> renderNode(n, container));
-    }
-  }catch(err){ console.warn('could not load site tree', err); }
-
-  try{
-    const data = await api(`/api/sites/${selectedSite.name}/data`);
-    latestAggregatedData = data || {};
-    renderDataPalette(data || {});
-  }catch(e){ console.warn('could not load data palette', e); }
-}
-
-// Visual Editor (GrapesJS) integration
-// Live validation system
-function createLiveValidator(apiDef, formElement){
-  const validators = {};
-  let bodySchema = {};
-  try{
-    if(apiDef.bodyTemplate){
-      bodySchema = typeof apiDef.bodyTemplate === 'string' ? JSON.parse(apiDef.bodyTemplate) : apiDef.bodyTemplate;
-    }
-  }catch(e){}
-  
-  Object.keys(bodySchema).forEach(field => {
-    const sampleValue = bodySchema[field];
-    validators[field] = {
-      type: typeof sampleValue,
-      required: sampleValue !== null && sampleValue !== undefined,
-      validate: (value) => {
-        if(validators[field].required && !value) return { valid: false, error: 'Required field' };
-        if(validators[field].type === 'number' && value && isNaN(Number(value))) return { valid: false, error: 'Must be a number' };
-        if(validators[field].type === 'boolean' && value && !['true','false','0','1'].includes(String(value).toLowerCase())) return { valid: false, error: 'Must be true/false' };
-        if(String(value).includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return { valid: false, error: 'Invalid email format' };
-        return { valid: true };
-      }
-    };
-  });
-  
-  // Attach live validation to form inputs
-  if(formElement){
-    formElement.querySelectorAll('input, textarea, select').forEach(input => {
-      const fieldName = input.getAttribute('name') || input.getAttribute('data-field');
-      if(fieldName && validators[fieldName]){
-        input.addEventListener('input', () => {
-          const result = validators[fieldName].validate(input.value);
-          const errorEl = input.parentElement.querySelector('.validation-error');
-          if(!result.valid){
-            if(!errorEl){
-              const err = document.createElement('div');
-              err.className = 'validation-error';
-              err.textContent = result.error;
-              input.parentElement.appendChild(err);
-            } else {
-              errorEl.textContent = result.error;
-            }
-            input.style.borderColor = '#ef4444';
-          } else {
-            if(errorEl) errorEl.remove();
-            input.style.borderColor = '';
+        window.lastRestClientData = {};
+        window.addEventListener('message', function(event) {
+          if (event.data && event.data.type === 'rest-client-result') {
+            window.lastRestClientData = event.data;
           }
         });
+
+        // REST client data handling moved to dragdrop.js
+      });
+      const qs = (s, el=document) => el.querySelector(s);
+      const qsa = (s, el=document) => Array.from(el.querySelectorAll(s));
+
+      // Top-level state
+      let sites = [];
+      let selectedSite = null;
+      let latestAggregatedData = {};
+      const apiSampleCache = {};
+
+      // Utility: escape text included in HTML to avoid markup injection
+      function escapeHtml(s){
+        if(s === null || s === undefined) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
       }
-    });
-  }
-  
-  return validators;
-}
 
-// Component library: pre-built patterns
-const ComponentLibrary = {
-  crudTable: (apiName, fields) => {
-    const compId = 'crud_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
-    const headers = fields.map(f => `<th>${f}</th>`).join('');
-    const cells = fields.map(f => `<td>{{this.${f}}}</td>`).join('');
-    return `<div id="${compId}" class="crud-table-component" style="margin:20px 0;padding:16px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:rgba(255,255,255,0.98)">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h3 style="margin:0">${apiName} Management</h3>
-    <button onclick="document.getElementById('${compId}_addForm').style.display='block'" class="btn small">+ Add New</button>
-  </div>
-  <div id="${compId}_addForm" style="display:none;padding:12px;background:rgba(0,0,0,0.02);border-radius:8px;margin-bottom:12px">
-    <form id="${compId}_form">${fields.map(f => `<div style="margin-bottom:8px"><label>${f}</label><input name="${f}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"/></div>`).join('')}
-      <button type="submit" class="btn small">Save</button>
-      <button type="button" onclick="this.closest('form').reset();document.getElementById('${compId}_addForm').style.display='none'" class="btn small ghost">Cancel</button>
-    </form>
-  </div>
-  <table style="width:100%;border-collapse:collapse">
-    <thead><tr style="background:rgba(0,0,0,0.04)">${headers}<th>Actions</th></tr></thead>
-    <tbody>{{#each ${apiName}}}<tr style="border-bottom:1px solid rgba(0,0,0,0.06)">${cells}<td><button class="btn-edit" data-id="{{this.id}}">Edit</button> <button class="btn-delete" data-id="{{this.id}}">Delete</button></td></tr>{{/each}}</tbody>
-  </table>
-</div>`;
-  },
-  searchForm: (apiName) => {
-    const formId = 'search_' + Date.now().toString(36);
-    return `<form id="${formId}" class="search-form" style="display:flex;gap:8px;padding:12px;background:rgba(0,0,0,0.02);border-radius:8px;margin:16px 0">
-  <input type="text" name="q" placeholder="Search ${apiName}..." style="flex:1;padding:10px;border:1px solid #ddd;border-radius:8px" />
-  <button type="submit" class="btn">Search</button>
-  <button type="reset" class="btn ghost">Clear</button>
-</form>
-<div id="${formId}_results"></div>`;
-  },
-  filterPanel: (fields) => {
-    const panelId = 'filter_' + Date.now().toString(36);
-    return `<div id="${panelId}" class="filter-panel" style="padding:16px;background:rgba(0,0,0,0.02);border-radius:12px;margin:16px 0">
-  <h4 style="margin:0 0 12px 0">Filters</h4>
-  ${fields.map(f => `<div style="margin-bottom:12px"><label style="display:block;margin-bottom:4px;font-weight:600">${f}</label><select name="filter_${f}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"><option value="">All</option></select></div>`).join('')}
-  <button onclick="applyFilters('${panelId}')" class="btn">Apply Filters</button>
-</div>`;
-  },
-  pagination: (apiName) => {
-    const pageId = 'page_' + Date.now().toString(36);
-    return `<div id="${pageId}" class="pagination" style="display:flex;justify-content:center;align-items:center;gap:12px;padding:16px;margin:20px 0">
-  <button onclick="prevPage('${pageId}')" class="btn small ghost">← Previous</button>
-  <span id="${pageId}_info" style="font-weight:600">Page 1</span>
-  <button onclick="nextPage('${pageId}')" class="btn small ghost">Next →</button>
-</div>
-<script>
-let ${pageId}_current = 1;
-function prevPage(id){ if(${pageId}_current > 1){ ${pageId}_current--; document.getElementById(id+'_info').textContent='Page '+${pageId}_current; loadPage${pageId}(${pageId}_current); }}
-function nextPage(id){ ${pageId}_current++; document.getElementById(id+'_info').textContent='Page '+${pageId}_current; loadPage${pageId}(${pageId}_current); }
-function loadPage${pageId}(page){ console.log('Load page', page); }
-</script>`;
-  }
-};
-
-// Field mapper UI
-function showFieldMapper(apiName, apiDef, responseData){
-  let requestFields = [];
-  let responseFields = [];
-  
-  // Parse request schema
-  if(apiDef && apiDef.bodyTemplate){
-    try{
-      const bodyObj = typeof apiDef.bodyTemplate === 'string' ? JSON.parse(apiDef.bodyTemplate) : apiDef.bodyTemplate;
-      if(bodyObj && typeof bodyObj === 'object'){
-        requestFields = Object.keys(bodyObj).map(k => ({ name: k, type: typeof bodyObj[k], sample: bodyObj[k], htmlType: inferHtmlType(bodyObj[k]) }));
+      // If AppUtils.Logger is available (utils.js loads before this), wire console methods to it
+      if(window.AppUtils && AppUtils.Logger){
+        const L = AppUtils.Logger;
+        console.info = (...a)=> L.info(...a);
       }
-    }catch(e){}
-  }
-  
-  // Parse response schema
-  if(responseData && typeof responseData === 'object'){
-    if(Array.isArray(responseData) && responseData.length > 0){
-      responseFields = Object.keys(responseData[0]).map(k => ({ name: k, type: typeof responseData[0][k], sample: responseData[0][k] }));
-    } else {
-      responseFields = Object.keys(responseData).map(k => ({ name: k, type: typeof responseData[k], sample: responseData[k] }));
-    }
-  }
-  
-  function inferHtmlType(val){
-    if(typeof val === 'number') return 'number';
-    if(typeof val === 'boolean') return 'checkbox';
-    if(String(val).includes('@')) return 'email';
-    if(String(val).match(/^\d{4}-\d{2}-\d{2}/)) return 'date';
-    return 'text';
-  }
-  
-  const html = `
-    <div class="field-mapper-panel" style="max-height:70vh;overflow:auto">
-      <h3>Field Mapper: ${apiName}</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px">
-        <div class="mapper-section">
-          <h4 style="color:var(--accent-2);margin-bottom:12px">Request Fields → Form Inputs</h4>
-          ${requestFields.length ? `<div class="mapper-list">${requestFields.map(f => `
-            <div class="mapper-item" style="padding:12px;background:rgba(79,70,229,0.06);border-left:4px solid var(--accent);border-radius:8px;margin-bottom:8px">
-              <div style="font-weight:700;margin-bottom:4px">${f.name}</div>
-              <div style="display:flex;gap:8px;align-items:center;color:var(--muted);font-size:0.9rem">
-                <span>Type: <code>${f.type}</code></span>
-                <span>→</span>
-                <span>HTML: <code>&lt;input type="${f.htmlType}"&gt;</code></span>
-              </div>
-              <div style="margin-top:6px;padding:6px;background:rgba(0,0,0,0.04);border-radius:4px;font-size:0.85rem;font-family:monospace">Sample: ${escapeHtml(JSON.stringify(f.sample))}</div>
-            </div>
-          `).join('')}</div>` : '<div class="muted">No request fields defined</div>'}
-        </div>
-        <div class="mapper-section">
-          <h4 style="color:var(--accent-2);margin-bottom:12px">Response Fields → Display Elements</h4>
-          ${responseFields.length ? `<div class="mapper-list">${responseFields.map(f => `
-            <div class="mapper-item" style="padding:12px;background:rgba(6,182,212,0.06);border-left:4px solid var(--accent-2);border-radius:8px;margin-bottom:8px">
-              <div style="font-weight:700;margin-bottom:4px">${f.name}</div>
-              <div style="color:var(--muted);font-size:0.9rem">Type: <code>${f.type}</code></div>
-              <div style="margin-top:6px;padding:6px;background:rgba(0,0,0,0.04);border-radius:4px;font-size:0.85rem;font-family:monospace">Sample: ${escapeHtml(JSON.stringify(f.sample))}</div>
-              <div style="margin-top:8px"><button class="btn small" onclick="insertField('${apiName}.${f.name}')">Insert {{${apiName}.${f.name}}}</button></div>
-            </div>
-          `).join('')}</div>` : '<div class="muted">No response data available</div>'}
-        </div>
-      </div>
-      <div style="margin-top:20px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px">
-        <h4>Quick Actions</h4>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn small" onclick="generateFullForm('${apiName}')">Generate Complete Form</button>
-          <button class="btn small outline" onclick="generateTableView('${apiName}')">Generate Table View</button>
-        </div>
-      </div>
-    </div>
-    <script>
-    function insertField(path){ 
-      const editor = document.getElementById('pageEditor'); 
-      if(editor){ 
-        const pos = editor.selectionStart || 0; 
-        const val = editor.value; 
-        editor.value = val.slice(0,pos) + '{{' + path + '}}' + val.slice(pos); 
-        editor.focus(); 
-      } 
-    }
-    function generateFullForm(api){ alert('Full form for ' + api + ' will be inserted into editor'); }
-    function generateTableView(api){ alert('Table view for ' + api + ' will be inserted into editor'); }
-    </script>
-  `;
-  
-  AppUtils.Modal.show({ title: 'Field Mapper', body: html });
-}
 
-async function openVisualEditor(){
-  if(!selectedSite){ showMessage('Select a site first','Error'); return; }
-  const path = qs('#pageSelect').value || 'index.html';
-  let content = '';
-  try{ content = await api(`/api/sites/${selectedSite.name}/pages/content?path=${encodeURIComponent(path)}`) || ''; }catch(e){ content = '<div><h2>New page</h2></div>'; }
+      function generateApiFormHtml(apiName, method, fields = [], payload = {}, mapping = null, siteName = ''){
+        const formId = 'abform_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
+        const sourceFields = Array.isArray(fields) ? fields : (payload && typeof payload === 'object' ? Object.keys(payload) : []);
+        const mappings = mapping && Array.isArray(mapping.fieldMappings) ? mapping.fieldMappings : null;
 
-  const modal = qs('#gjs-modal'); if(!modal) return; modal.style.display = 'block';
-  if(window.editorInstance){ window.editorInstance.destroy(); window.editorInstance = null; }
-  const editor = grapesjs.init({ container: '#gjs', fromElement: false, height: '100%', storageManager: { autoload: false }, components: content, blockManager: { appendTo: '#gjs' } });
-  window.editorInstance = editor;
+        const buildField = (f, map) => {
+          const safeName = String(f).replace(/"/g, '&quot;');
+          const safeLoc = (map && map.location) ? map.location : 'body';
+          let inputType = 'text';
+          if(payload && payload[f] !== undefined){ const v = payload[f]; if(typeof v === 'number') inputType = 'number'; else if(typeof v === 'boolean') inputType = 'checkbox'; else if(String(v).includes('@')) inputType = 'email'; }
+          if(inputType === 'checkbox'){
+            return `<div style="margin-bottom:8px"><label><input type=\"checkbox\" name=\"${safeName}\" data-field=\"${safeName}\" data-location=\"${safeLoc}\" ${payload[f] ? 'checked' : ''}> ${safeName}</label></div>`;
+          }
+          return `<div style="margin-bottom:12px"><label style=\"display:block;font-weight:600;margin-bottom:6px\">${safeName}</label><input type=\"${inputType}\" name=\"${safeName}\" data-field=\"${safeName}\" data-location=\"${safeLoc}\" style=\"width:100%;padding:10px;border:1px solid #ddd;border-radius:8px\" value=\"${escapeHtml(String(payload[f] || ''))}\" /></div>`;
+        };
 
-  const bm = editor.BlockManager;
-  
-  // HTTP Method-specific blocks
-  const apis = (selectedSite && selectedSite.apis) || [];
-  
-  // GET blocks - Data display components
-  apis.filter(a => (a.method||'GET').toUpperCase() === 'GET').forEach(apiDef => {
-    const fields = [];
-    try{
-      const sample = latestAggregatedData[apiDef.name];
-      if(sample){
-        if(Array.isArray(sample) && sample[0]) fields.push(...Object.keys(sample[0]));
-        else if(typeof sample === 'object') fields.push(...Object.keys(sample));
+        let inputsHtml = '';
+        if(mappings){ inputsHtml = mappings.map(m=> buildField(m.requestField, m)).join('\n'); }
+        else { inputsHtml = (sourceFields.length ? sourceFields.map(f=> buildField(f, null)).join('\n') : '<p>No fields available</p>'); }
+
+        const contentType = mapping && mapping.contentType ? mapping.contentType : 'application/json';
+        const cfg = { rawBodyTemplate: mapping && mapping.rawBodyTemplate ? mapping.rawBodyTemplate : '' };
+        const siteEsc = JSON.stringify(siteName || '');
+
+        const script = `<script>(function(){var form=document.getElementById('${formId}'); if(!form) return; form.addEventListener('submit', async function(e){ e.preventDefault(); var queryParams = {}; var bodyData = {}; var inputs = form.querySelectorAll('input, textarea, select'); inputs.forEach(function(inp){ var field = inp.getAttribute('data-field') || inp.name; if(!field) return; var loc = inp.getAttribute('data-location') || 'body'; var val = (inp.type === 'checkbox') ? inp.checked : inp.value; if(loc === 'query') queryParams[field] = val; else bodyData[field] = val; }); try{ var qs = Object.keys(queryParams).length ? ('?' + Object.keys(queryParams).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(queryParams[k]); }).join('&')) : ''; var url = '/api/sites/' + encodeURIComponent(${siteEsc}) + '/endpoints/' + encodeURIComponent(${JSON.stringify(apiName)}) + '/execute' + qs; var headers = {}; var bodyPayload = null; var ct = ${JSON.stringify(contentType)}; if(ct === 'application/json' && ${JSON.stringify(Boolean(cfg.rawBodyTemplate))}){ var raw = document.getElementById('${formId}_raw'); if(raw) { bodyPayload = raw.value; headers['Content-Type']='application/json'; } else { bodyPayload = JSON.stringify(bodyData); headers['Content-Type']='application/json'; } } else if(ct === 'application/x-www-form-urlencoded'){ var params = new URLSearchParams(); Object.keys(bodyData).forEach(function(k){ params.append(k, bodyData[k]); }); bodyPayload = params.toString(); headers['Content-Type'] = 'application/x-www-form-urlencoded'; } else if(ct === 'form-elements'){ bodyPayload = JSON.stringify(bodyData); headers['Content-Type']='application/json'; } else if(ct === 'query'){ bodyPayload = null; } else { bodyPayload = JSON.stringify(bodyData); headers['Content-Type']='application/json'; } var opts = { method: '${method}', headers: headers }; if(bodyPayload !== null) opts.body = bodyPayload; var resp = await fetch(url, opts); var text = null; try{ text = await resp.json(); }catch(e){ text = await resp.text(); } alert('Result: ' + JSON.stringify(text)); form.reset(); }catch(err){ console.error(err); alert('Error: ' + (err && err.message ? err.message : String(err))); } }); })();<\/script>`;
+
+        const html = `<form id="${formId}" class="api-form" data-api="${apiName}" data-method="${method}" style="padding:16px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:rgba(255,255,255,0.98);margin:16px 0">\n    <h3 style="margin:0 0 16px 0">${method} ${apiName}</h3>\n    ${inputsHtml}\n    <div style="display:flex;gap:8px"><button type="submit" class="btn">Submit</button><button type="reset" class="btn ghost">Reset</button></div>\n  </form>\n  ${script}`;
+        return html;
       }
-    }catch(e){}
-    
-    bm.add(`get-${apiDef.name}`, {
-      label: `GET ${apiDef.name}`,
-      category: 'GET Data Display',
-      content: ComponentLibrary.crudTable(apiDef.name, fields.length ? fields : ['id','name','value'])
-    });
-  });
-  
-  // POST/PUT/PATCH blocks - Form components with safe field handling
-  apis.filter(a => ['POST','PUT','PATCH'].includes((a.method||'GET').toUpperCase())).forEach(apiDef => {
-    const method = (apiDef.method||'POST').toUpperCase();
-    let fields = [];
-    try{
-      if(apiDef.bodyTemplate){
-        const bodyObj = typeof apiDef.bodyTemplate === 'string' ? JSON.parse(apiDef.bodyTemplate) : apiDef.bodyTemplate;
-        fields = Object.keys(bodyObj);
+
+      function showMessage(text, title = 'Notice'){
+        // Prefer top-bar notifications for non-blocking UX when available
+        try{
+          if(window.AppUtils && AppUtils.Notify){
+            const t = (title||'').toLowerCase();
+            if(t.includes('error') || t.includes('invalid')) return AppUtils.Notify.error(escapeHtml(text));
+            if(t.includes('saved') || t.includes('bound') || t.includes('success')) return AppUtils.Notify.success(escapeHtml(text));
+            return AppUtils.Notify.info(escapeHtml(text));
+          }
+        }catch(e){ /* ignore and fallback */ }
+
+        // fallback to modal if available, else alert
+        if(window.AppUtils && AppUtils.Modal){
+          AppUtils.Modal.show({ title, body: escapeHtml(text) });
+        } else {
+          alert(text);
+        }
       }
-    }catch(e){}
-    
-    // Use centralized generator to create form + submit script that respects mapping.contentType
-    const mapping = (apiDef && apiDef.mappingConfig) ? apiDef.mappingConfig : null;
-    const sample = (apiDef && apiDef.sample) ? apiDef.sample : null;
-    const formHtml = generateApiFormHtml(apiDef.name, method, fields, sample, mapping, selectedSite ? selectedSite.name : '');
-    bm.add(`${method.toLowerCase()}-${apiDef.name}`, {
-      label: `${method} ${apiDef.name}`,
-      category: `${method} Forms`,
-      content: formHtml
-    });
-  });
-  
-  // DELETE blocks - Delete buttons
+
+      // NOTE: Preview injection removed — live preview should show the original page without admin styling.
+
+      async function api(path, options={}){
+        const res = await fetch(path, options);
+        const ct = (res.headers.get('content-type')||'').toLowerCase();
+        const result = { status: res.status, headers: res.headers };
+        if(ct.includes('application/json')){
+          result.body = await res.json();
+        } else {
+          result.body = await res.text();
+        }
+        // return a small wrapper to keep previous usage where api(...) returned body directly
+        return result.body;
+      }
+
+      async function loadSites(){
+        try{ sites = await api('/api/sites') || []; }catch(e){ console.error(e); sites = []; }
+        await renderSiteList();
+        // auto-select first site if none selected to populate editor
+        if(!selectedSite && sites && sites.length>0){
+          await selectSite(sites[0].name);
+        }
+      }
+
+      async function renderSiteList(){
+        const ul = qs('#siteList'); if(!ul) return;
+        ul.innerHTML = '';
+        sites.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = s.name;
+          li.style.display = 'flex'; li.style.justifyContent = 'space-between'; li.style.alignItems = 'center';
+          // clicking the list item opens the site
+          li.addEventListener('click', ()=> selectSite(s.name));
+          if(selectedSite && selectedSite.name === s.name) li.classList.add('active');
+          ul.appendChild(li);
+        });
+      }
+
+      async function loadPageIntoEditor(path, siteName){
+        try{
+          const content = await api(`/api/sites/${siteName}/pages/content?path=${encodeURIComponent(path)}`);
+          const sel = qs('#pageSelect'); if(sel) sel.value = path;
+          const editor = qs('#pageEditor'); if(editor){ editor.value = content; }
+          const preview = qs('#previewFrame'); if(preview){ preview.src = `/site/${siteName}/${path}`; }
+        }catch(e){ showMessage('Could not load page content', 'Error'); console.error(e); }
+      }
+
+      async function selectSite(name){
+        selectedSite = await api(`/api/sites/${name}`) || null;
+        window.selectedSite = selectedSite;
+        await renderSiteList();
+        await renderSiteDetails();
+      }
+
+      async function renderSiteDetails(){
+        if(!selectedSite) return;
+        qs('#siteActions').textContent = `Selected: ${selectedSite.name}`;
+        const apiList = qs('#apiList'); apiList.innerHTML='';
+        (selectedSite.apis||[]).forEach(a=>{
+          const div = document.createElement('div'); div.className='item';
+          const left = document.createElement('div');
+          const title = document.createElement('strong'); title.textContent = a.name;
+          const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = a.url;
+          const methodBadge = document.createElement('span'); methodBadge.className = 'api-method-badge';
+          const methodText = (a.method || 'GET').toUpperCase(); methodBadge.textContent = methodText;
+          if(['POST','PUT','PATCH','DELETE'].includes(methodText)) methodBadge.classList.add('method-create'); else methodBadge.classList.add('method-fetch');
+          // assemble left column: title, method badge, then url meta
+          left.appendChild(title);
+          left.appendChild(methodBadge);
+          left.appendChild(meta);
+          const right = document.createElement('div');
+          right.innerHTML = `<button class="btn small outline" data-edit-api="${a.name}">Edit</button> <button class="btn small" data-api="${a.name}">Test</button>`;
+          div.appendChild(left); div.appendChild(right);
+          apiList.appendChild(div);
+        });
+
+        // mappings are now auto-created from palette drops and visual editor bindings
+
+        const preview = qs('#previewFrame'); if(preview){ preview.src = `/site/${selectedSite.name}/`; }
+        const pl = qs('#previewLink'); if(pl) pl.href = `/site/${selectedSite.name}/`;
+        // (preview drop handling removed) drag->editor now creates forms for creation methods
+
+        try{
+          const pages = await api(`/api/sites/${selectedSite.name}/pages`);
+          const sel = qs('#pageSelect'); if(sel){ sel.innerHTML=''; pages.forEach(p=>{ const o = document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o); }); }
+          // auto-load first page if editor is empty
+          try{
+            const editor = qs('#pageEditor');
+            if(pages && pages.length>0 && editor && (!editor.value || editor.value.trim().length===0)){
+              await loadPageIntoEditor(pages[0], selectedSite.name);
+            }
+          }catch(e){ /* ignore */ }
+        }catch(e){ console.warn('could not load pages', e); }
+
+        // render full folder/file tree inside siteFileTree
+        try{
+          const tree = await api(`/api/sites/${selectedSite.name}/tree`);
+          const container = qs('#siteFileTree'); if(container){
+            container.innerHTML = '';
+            function renderNode(node, parentEl){
+              const nodeEl = document.createElement('div');
+              nodeEl.className = node.type === 'dir' ? 'fm-dir' : 'fm-file';
+              nodeEl.style.padding = '4px 6px';
+              nodeEl.style.cursor = 'pointer';
+              nodeEl.title = node.path;
+              if(node.type === 'dir'){
+                const label = document.createElement('div'); label.textContent = node.name; label.style.fontWeight='600';
+                const childrenWrap = document.createElement('div'); childrenWrap.style.marginLeft='12px'; childrenWrap.style.display = 'none';
+                label.onclick = (ev)=>{ ev.stopPropagation(); childrenWrap.style.display = childrenWrap.style.display === 'none' ? 'block' : 'none'; };
+                nodeEl.appendChild(label);
+                nodeEl.appendChild(childrenWrap);
+                (node.children||[]).forEach(ch=> renderNode(ch, childrenWrap));
+              } else {
+                nodeEl.textContent = node.name;
+                nodeEl.onclick = async (ev)=>{ ev.stopPropagation(); const sel = qs('#pageSelect'); if(sel) sel.value = node.path; await loadPageIntoEditor(node.path, selectedSite.name); };
+              }
+              parentEl.appendChild(nodeEl);
+            }
+            (tree||[]).forEach(n=> renderNode(n, container));
+          }
+        }catch(err){ console.warn('could not load site tree', err); }
+
+        try{
+          const data = await api(`/api/sites/${selectedSite.name}/data`);
+          latestAggregatedData = data || {};
+          renderDataPalette(data || {});
+        }catch(e){ console.warn('could not load data palette', e); }
+      }
+
+      // Visual editor integration removed to simplify debugging and avoid syntax issues.
+  if (typeof bm !== 'undefined' && typeof editor !== 'undefined' && typeof ComponentLibrary !== 'undefined') {
   apis.filter(a => (a.method||'GET').toUpperCase() === 'DELETE').forEach(apiDef => {
     const btnId = 'del_' + apiDef.name + '_' + Date.now().toString(36);
     bm.add(`delete-${apiDef.name}`, {
@@ -581,7 +332,8 @@ async function openVisualEditor(){
     modal.style.display = 'none';
   };
   qs('#closeVisualBtn').onclick = ()=>{ modal.style.display = 'none'; if(window.editorInstance){ window.editorInstance.destroy(); window.editorInstance=null; } };
-}
+
+  }
 
 async function testApi(apiDef){
   try{
@@ -654,8 +406,9 @@ function renderDataPalette(data){
       detailsBtn.style.marginLeft = 'auto';
       detailsBtn.onclick = async (ev) => {
         ev.stopPropagation();
-        // fetch sample lazily when user asks for details
-        const sample = await fetchApiSample(key) || nodeData;
+        // use stored sample from API definition
+        const apiDef = selectedSite.apis.find(a => a.name === key);
+        const sample = (apiDef && apiDef.bodyTemplate) || nodeData;
         showApiDetails(key, apiMeta, apiDef, sample);
       };
       label.appendChild(detailsBtn);
@@ -690,14 +443,28 @@ function renderDataPalette(data){
         try{ if(selectedSite && selectedSite.apis){ const ad = selectedSite.apis.find(a=>a.name===key); if(ad && ad.mappingConfig) mappingConfig = ad.mappingConfig; } }catch(e){}
         if(mappingConfig && Array.isArray(mappingConfig.fieldMappings) && mappingConfig.fieldMappings.length){
           const mappedFields = mappingConfig.fieldMappings.map(fm=>fm.requestField);
-          // include sample only if we have it cached; otherwise let drop handler fetch lazily
-          const includeSample = apiSampleCache[key] ? apiSampleCache[key] : null;
+          // include sample from stored API definition
+          let includeSample = null;
+          try {
+            const apiDef = selectedSite.apis.find(a => a.name === key);
+            if (apiDef && apiDef.bodyTemplate) {
+              includeSample = apiDef.bodyTemplate;
+            }
+          } catch (e) {}
           payload = Object.assign(payload, { apiName: key, method: (m.method || 'GET').toUpperCase(), url: (m.url||''), fields: mappedFields, mappingConfig, sample: includeSample });
         } else {
-          const includeSample = apiSampleCache[key] ? apiSampleCache[key] : null;
+          // include sample from stored API definition
+          let includeSample = null;
+          try {
+            const apiDef = selectedSite.apis.find(a => a.name === key);
+            if (apiDef && apiDef.bodyTemplate) {
+              includeSample = apiDef.bodyTemplate;
+            }
+          } catch (e) {}
           payload = Object.assign(payload, { apiName: key, method: (m.method || 'GET').toUpperCase(), url: (m.url||''), fields, sample: includeSample });
         }
       }
+      console.log('Drag start for', key, payload);
       e.dataTransfer.setData('application/json', JSON.stringify(payload));
       // also set text/plain for fallback / template insertion
       if(payload.type === 'array') e.dataTransfer.setData('text/plain', `{{#each ${fullPath}}}`);
@@ -1490,8 +1257,48 @@ const restClientHtml = `<div style="max-height:80vh;overflow:auto;"><style>${sty
     const saveBtn = document.getElementById('saveApiTestResultBtn');
     if (saveBtn) {
       saveBtn.onclick = () => {
-        processApiTestResult(apiDef, body);
-        AppUtils.Modal.hide && AppUtils.Modal.hide();
+        // Collect API definition from form
+        const url = document.getElementById('url').value;
+        const method = document.getElementById('method').value;
+        let headers = {};
+        document.querySelectorAll('#headers-list .header-row').forEach(row => {
+          const k = row.querySelector('.header-key').value;
+          const v = row.querySelector('.header-value').value;
+          if (k) headers[k] = v;
+        });
+        let params = {};
+        document.querySelectorAll('#params-list .param-row').forEach(row => {
+          const k = row.querySelector('.param-key').value;
+          const v = row.querySelector('.param-value').value;
+          if (k) params[k] = v;
+        });
+        const bodyType = document.getElementById('body-type').value;
+        let bodyTemplate = document.getElementById('body').value;
+        if (bodyType === 'json' && bodyTemplate) {
+          try { bodyTemplate = JSON.parse(bodyTemplate); } catch (e) {}
+        }
+        const apiName = apiDef.name || url.split('/').pop() || 'new-api-' + Date.now();
+        const newApiDef = { name: apiName, url, method, headers, params, bodyTemplate };
+        const isNew = !apiDef.name;
+        const endpoint = isNew ? `/api/sites/${selectedSite.name}/apis` : `/api/sites/${selectedSite.name}/apis/${encodeURIComponent(apiDef.name)}`;
+        const methodHttp = isNew ? 'POST' : 'PUT';
+        fetch(endpoint, { method: methodHttp, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newApiDef) })
+          .then(resp => resp.json())
+          .then(updated => {
+            if (isNew) {
+              selectedSite.apis.push(updated);
+            } else {
+              const idx = selectedSite.apis.findIndex(a => a.name === apiDef.name);
+              if (idx >= 0) selectedSite.apis[idx] = updated;
+            }
+            renderSiteDetails();
+            AppUtils.Modal.hide();
+            showMessage('API saved', 'Saved');
+          })
+          .catch(err => {
+            console.error(err);
+            showMessage('Failed to save API', 'Error');
+          });
       };
     }
   }, 100);
@@ -1566,186 +1373,7 @@ if(editorEl){
     e.preventDefault();
     try{ _lastDropIndex = getCaretIndexFromCoords(editorEl, e.clientX, e.clientY); }catch(err){ _lastDropIndex = editorEl.selectionStart || 0; }
   });
-  editorEl.addEventListener('drop', async (e)=>{
-    e.preventDefault();
-    // Prefer JSON payload set by palette tree
-    let text = e.dataTransfer.getData('application/json');
-    let payload = null;
-    if(text){ try{ payload = JSON.parse(text); }catch(err){ payload = null; } }
-    if(!payload){ text = e.dataTransfer.getData('text/plain'); }
-    // use last computed drop index from dragover; fallback to current selection
-    const start = (typeof _lastDropIndex === 'number' && _lastDropIndex >= 0) ? _lastDropIndex : (editorEl.selectionStart || 0);
-    const end = editorEl.selectionEnd || start;
-    const val = editorEl.value;
-    // If payload represents a top-level API with an API name, insert appropriate component based on method
-    if(payload && payload.apiName){
-      const method = (payload.method||'GET').toUpperCase();
-      const apiName = payload.apiName;
-      // if payload lacks sample, fetch lazily now
-      if(!payload.sample){
-        try{ const s = await fetchApiSample(apiName); if(s) payload.sample = s; }catch(e){}
-        // also refresh mappingConfig from selectedSite if present
-        try{ if(selectedSite && selectedSite.apis){ const ad = selectedSite.apis.find(a=>a.name===apiName); if(ad && ad.mappingConfig) payload.mappingConfig = ad.mappingConfig; } }catch(e){}
-      }
-      const fields = payload.fields && payload.fields.length ? payload.fields : (payload.sample && typeof payload.sample === 'object' ? Object.keys(payload.sample) : []);
-      let componentHtml = '';
-      
-      if(method === 'GET'){
-        // Generate display component (table/list) for GET
-        const compId = 'abcomp_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
-        const tableRows = fields.length ? fields.map(f => `<th>${f}</th>`).join('') : '<th>Data</th>';
-        const tableCells = fields.length ? fields.map(f => `<td>{{${apiName}.${f}}}</td>`).join('') : '<td>{{' + apiName + '}}</td>';
-        componentHtml = `<!-- ${method} Display Component -->
-<div id=\"${compId}\" class=\"ab-display-component\" data-ab-api=\"${apiName}\" style=\"margin:16px 0;padding:12px;border:1px solid rgba(0,0,0,0.08);border-radius:8px\">
-  <h3 style=\"margin:0 0 12px 0\">${apiName} Data</h3>
-  <table style=\"width:100%;border-collapse:collapse\">
-    <thead><tr style=\"background:rgba(0,0,0,0.02)\">${tableRows}</tr></thead>
-    <tbody>
-      {{#each ${apiName}}}
-      <tr style=\"border-bottom:1px solid rgba(0,0,0,0.06)\">${tableCells}</tr>
-      {{/each}}
-    </tbody>
-  </table>
-</div>`;
-        showMessage('Inserted display table for ' + apiName + '. Data will populate from API on page load.', 'Component inserted');
-      } else if(['POST','PUT','PATCH'].includes(method)){
-        // Generate simple form for POST/PUT/PATCH
-        const formId = 'abform_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
-        // detect mapping config if present
-        let mapping = payload.mappingConfig || null;
-        if(!mapping){ try{ if(selectedSite && selectedSite.apis){ const ad = selectedSite.apis.find(a=>a.name===apiName); if(ad && ad.mappingConfig) mapping = ad.mappingConfig; } }catch(e){}
-        
-        let inputsHtml = '';
-        if(mapping && Array.isArray(mapping.fieldMappings) && mapping.fieldMappings.length){
-          inputsHtml = mapping.fieldMappings.map(mf => {
-            const f = mf.requestField;
-            // try to infer type from sample using responsePath
-            let inputType = 'text';
-            if(payload.sample && payload.sample[mf.responsePath] !== undefined){
-              const val = payload.sample[mf.responsePath];
-              if(typeof val === 'number') inputType = 'number';
-              else if(typeof val === 'boolean') inputType = 'checkbox';
-              else if(String(val).includes('@')) inputType = 'email';
-            }
-            if(inputType === 'checkbox'){
-              return `<label><input type=\"${inputType}\" name=\"${escapeHtml(f)}\" data-field=\"${escapeHtml(f)}\" data-location=\"${escapeHtml(mf.location || 'body')}\"> ${escapeHtml(f)}</label><br>`;
-            }
-            return `<label>${escapeHtml(f)}: <input type=\"${inputType}\" name=\"${escapeHtml(f)}\" data-field=\"${escapeHtml(f)}\" data-location=\"${escapeHtml(mf.location || 'body')}\"></label><br>`;
-          }).join('\n');
-        } else {
-          inputsHtml = (fields.length ? fields.map(f=> {
-            let inputType = 'text';
-            if(payload.sample && payload.sample[f] !== undefined){
-              const val = payload.sample[f];
-              if(typeof val === 'number') inputType = 'number';
-              else if(typeof val === 'boolean') inputType = 'checkbox';
-              else if(String(val).includes('@')) inputType = 'email';
-            }
-            if(inputType === 'checkbox'){
-              return `<label><input type=\"${inputType}\" name=\"${escapeHtml(f)}\" data-field=\"${escapeHtml(f)}\" data-location=\"body\"> ${escapeHtml(f)}</label><br>`;
-            }
-            return `<label>${escapeHtml(f)}: <input type=\"${inputType}\" name=\"${escapeHtml(f)}\" data-field=\"${escapeHtml(f)}\" data-location=\"body\"></label><br>`;
-          }).join('\n') : '<p>No fields available</p>');
-        }
-
-        // build submit script that honors mapping.contentType
-        const contentTypeToUse = mapping && mapping.contentType ? mapping.contentType : 'application/json';
-        const script = `<script>
-document.getElementById('${formId}').addEventListener('submit', async function(e){
-  e.preventDefault();
-  var queryParams = {};
-  var bodyData = {};
-  this.querySelectorAll('input, textarea, select').forEach(function(inp){
-    var field = inp.getAttribute('data-field') || inp.name;
-    if(!field) return;
-    var loc = inp.getAttribute('data-location') || 'body';
-    var val = (inp.type === 'checkbox') ? inp.checked : inp.value;
-    if(loc === 'query') queryParams[field] = val; else bodyData[field] = val;
-  });
-  try{
-    var headers = {};
-    var bodyPayload = null;
-    // build query string if needed
-    var qs = Object.keys(queryParams).length ? ('?' + Object.keys(queryParams).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(queryParams[k]); }).join('&')) : '';
-    if('${contentTypeToUse}' === 'application/x-www-form-urlencoded'){
-      var params = new URLSearchParams();
-      Object.keys(bodyData).forEach(function(k){ params.append(k, bodyData[k]); });
-      bodyPayload = params.toString(); headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    } else if('${contentTypeToUse}' === 'form-elements'){
-      // send plain key/value JSON for individual form elements
-      bodyPayload = JSON.stringify(bodyData); headers['Content-Type'] = 'application/json';
-    } else {
-      // default: check for raw editor override, else wrapped JSON
-      var rawEl = document.getElementById('${formId}_raw');
-      if(rawEl){ bodyPayload = rawEl.value; headers['Content-Type'] = 'application/json'; }
-      else { bodyPayload = JSON.stringify(bodyData); headers['Content-Type'] = 'application/json'; }
-    }
-    var resp = await fetch('/api/sites/${selectedSite ? selectedSite.name : ""}/endpoints/${apiName}/execute' + qs, {
-      method: 'POST',
-      headers: headers,
-      body: bodyPayload
-    });
-    var result = await resp.json();
-    alert('Success: ' + JSON.stringify(result));
-    this.reset();
-  }catch(err){
-    alert('Error: ' + err.message);
-  }
-});
-<\/script>`;
-
-        componentHtml = `<form id=\"${formId}\" style=\"padding:12px;border:1px solid #ddd;border-radius:8px;margin:8px 0\">\n  <h3>${method} ${apiName}</h3>\n  ${inputsHtml}\n  <button type=\"submit\">Submit</button>\n</form>\n${script}`;
-        showMessage('Inserted ' + method + ' form for ' + apiName, 'Form inserted');
-      } else if(method === 'DELETE'){
-        // Generate delete button with confirmation
-        const btnId = 'abdel_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
-        const script = `<script>(function(){var b=document.getElementById('${btnId}'); if(!b) return; b.addEventListener('click', async function(){ if(!confirm('Are you sure you want to delete this item?')) return; try{ var resp = await fetch('/api/sites/${selectedSite ? selectedSite.name : ""}/endpoints/'+encodeURIComponent('${apiName}')+'/execute', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({}) }); alert('Deleted'); location.reload(); }catch(e){ console.error(e); alert('Delete failed: '+(e&&e.message?e.message:String(e))); } });})()<\/script>`;
-        componentHtml = `<button id=\"${btnId}\" class=\"btn-delete\" data-ab-api=\"${apiName}\" data-ab-method=\"DELETE\" style=\"padding:8px 16px;background:#ef4444;color:white;border:0;border-radius:8px;cursor:pointer;font-weight:600\">Delete ${apiName}</button>\n${script}`;
-        showMessage('Inserted DELETE button for ' + apiName + ' with confirmation.', 'Button inserted');
-      } else {
-        // Fallback for other methods
-        const btnId = 'abbtn_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
-        const script = `<script>(function(){var b=document.getElementById('${btnId}'); if(!b) return; b.addEventListener('click', async function(){ try{ var resp = await fetch('/api/sites/${selectedSite ? selectedSite.name : ""}/endpoints/'+encodeURIComponent('${apiName}')+'/execute', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({}) }); var result = await resp.json(); alert('${method} ${apiName}: ' + JSON.stringify(result)); }catch(e){ alert('Failed: '+(e&&e.message?e.message:String(e))); } });})()<\/script>`;
-        componentHtml = `<button id=\"${btnId}\" data-ab-api=\"${apiName}\" data-ab-method=\"${method}\" style=\"padding:8px 16px;background:#3b82f6;color:white;border:0;border-radius:8px;cursor:pointer;font-weight:600\">${method} ${apiName}</button>\n${script}`;
-        showMessage('Inserted ' + method + ' button for ' + apiName + '.', 'Button inserted');
-      }
-
-      const newVal = val.slice(0,start) + componentHtml + val.slice(end);
-      editorEl.value = newVal;
-      const pos = start + componentHtml.length;
-      editorEl.selectionStart = editorEl.selectionEnd = pos;
-      return;
-    }
-
-    // If payload indicates a field or value, fallback to inserting placeholder
-    if(payload && payload.type){
-      const fullPath = payload.apiPath; // full dotted path
-      const before = val.slice(0, start);
-      const lastOpen = before.lastIndexOf('{{#each');
-      const lastClose = before.lastIndexOf('{{/each}}');
-      const insideLoop = lastOpen > lastClose;
-      let insertText = '';
-      if(insideLoop){
-        const parts = fullPath.split('.');
-        const field = parts[parts.length-1];
-        insertText = `{{this.${field}}}`;
-      } else {
-        insertText = `{{${fullPath}}}`;
-      }
-      const newVal = val.slice(0,start) + insertText + val.slice(end);
-      editorEl.value = newVal;
-      const pos = start + insertText.length;
-      editorEl.selectionStart = editorEl.selectionEnd = pos;
-      return;
-    }
-
-    // Fallback: insert plain text
-    const fallback = text || '';
-    editorEl.value = val.slice(0,start) + fallback + val.slice(end);
-    const pos = start + fallback.length;
-      editorEl.selectionStart = editorEl.selectionEnd = pos;
-    }
-    });
+  // Drop handling moved to dragdrop.js for centralization
 }
 
 // Guided tour removed — Intro.js usage and UI were removed per request.

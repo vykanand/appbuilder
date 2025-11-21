@@ -6,22 +6,16 @@
   </head>
   <body>
     <h1>Welcome to demo site</h1>
-    <p>User name from API: <strong>{{username}}</strong> you live here : {{userApi.address.street}}</p>    
-     <p> {{userApi.address}} </p>
-Name - <p> {{userApi.name}} </p> 
-Addr - {{userApi.address.suite}}
-{{#each userApi}}
-<!-- LOOP_START:loop_mi7er0yf_rdc8pi:userApi -->
+    <p>User name from API: <strong>{{username}}</strong> you live here : 
+
+
+{{#each userlist}}
+<!-- LOOP_START:loop_mi8j7kwb_1ek0:userlist -->
   <div class="loop-item">
-    {{this.email}}
+   {{this.name}}
 {{this.username}}
-  </div>{{this.id}}
-{{userApi.email}}
-<!-- LOOP_END:loop_mi7er0yf_rdc8pi -->
+  </div>
+<!-- LOOP_END:loop_mi8j7kwb_1ek0 -->
 {{/each}}
-Company - {{userApi.company.name}}
-{{submituser}}
 
-
-<button id="abbtn_mi7x14um_g69n" data-ab-api="submituser" data-ab-method="POST" style="padding:8px 16px;background:#3b82f6;color:white;border:0;border-radius:8px;cursor:pointer;font-weight:600">POST submituser</button>
-<script>(function(){var b=document.getElementById('abbtn_mi7x14um_g69n'); if(!b) return; b.addEventListener('click', async function(){ try{ var resp = await fetch('/api/sites/demo/endpoints/'+encodeURIComponent('submituser')+'/execute', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({}) }); var result = await resp.json(); alert('POST submituser: ' + JSON.stringify(result)); }catch(e){ alert('Failed: '+(e&&e.message?e.message:String(e))); } });})()</script>
+<form id="abform_mi8r2sln_c4dv" data-ab-api="submituser" data-ab-method="POST"><label>title: <input type="text" id="abform_mi8r2sln_c4dv_field_title" name="title" data-field="title" placeholder="Hello World1"></label><br><label>body: <input type="text" id="abform_mi8r2sln_c4dv_field_body" name="body" data-field="body" placeholder="This is my test post"></label><br><label>userId: <input type="number" id="abform_mi8r2sln_c4dv_field_userId" name="userId" data-field="userId" placeholder="14"></label><br><button type="submit">Submit</button> <button type="reset">Reset</button></form><script>(function(){var f=document.getElementById("abform_mi8r2sln_c4dv"); if(!f) return; function showNotification(message, isSuccess){ var notif=document.createElement("div"); notif.textContent=message; notif.style.cssText="position:fixed;top:20px;right:20px;padding:10px 20px;border-radius:4px;color:#fff;background:"+ (isSuccess?"#4CAF50":"#f44336") +";z-index:10000"; document.body.appendChild(notif); setTimeout(function(){ if(notif.parentNode) notif.parentNode.removeChild(notif); }, 3000); } f.addEventListener("submit", function(e){ if(e && e.preventDefault) e.preventDefault(); var bodyData = {}; var inputs = f.querySelectorAll("input[data-field]"); for(var j=0; j<inputs.length; j++){ var inp=inputs[j]; var field = inp.getAttribute("data-field"); if(field){ var val = inp.type === "checkbox" ? inp.checked : inp.value; bodyData[field] = val; } } try{ var parts=window.location.pathname.split("/"); var site=parts.length>2?parts[2]:""; var xhr=new XMLHttpRequest(); xhr.open("POST", "/api/sites/"+site+"/endpoints/submituser/execute", true); xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8"); xhr.onreadystatechange=function(){ if(xhr.readyState!==4) return; if(xhr.status>=200 && xhr.status<300){ showNotification("Success!", true); f.reset(); } else { showNotification("Error: HTTP "+xhr.status, false); } }; xhr.send(JSON.stringify(bodyData)); }catch(err){ showNotification("Error: "+String(err), false); } }); })()</script>

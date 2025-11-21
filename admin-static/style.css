@@ -18,7 +18,7 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0; font-family:Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, -apple-system;
+  margin:0; font-family:'Montserrat', Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, -apple-system;
   background: linear-gradient(180deg,#051025 0%, #07122a 60%); color:var(--text); -webkit-font-smoothing:antialiased;
 }
 .app-shell{display:flex;min-height:100vh;max-width:1400px;margin:24px auto;padding:12px;gap:16px}
@@ -179,6 +179,11 @@ label, .muted, .small{color:var(--muted)}
 .ab-notify .btn.ghost{ background: transparent; border: 0; color: rgba(255,255,255,0.85); font-weight:600 }
 .node-children{margin-left:18px;border-left:1px dashed rgba(255,255,255,0.02);padding-left:8px;margin-top:4px}
 .loop-item{padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.04);background:rgba(255,255,255,0.015);margin:6px 0}
+
+/* Ensure Montserrat is used for admin notifications and modals */
+.ab-notify, .ab-notify * , .ab-modal, .ab-modal * {
+  font-family: 'Montserrat', Inter, "Segoe UI", Roboto, Arial, system-ui !important;
+}
 
 /* Make the variable palette scrollable when content grows and match viewer height */
 #dataPalette{max-height:var(--viewer-height);overflow:auto;padding-right:6px}

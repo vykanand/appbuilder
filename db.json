@@ -15,15 +15,19 @@
           "method": "GET",
           "headers": {},
           "params": {},
-          "bodyTemplate": null
+          "bodyTemplate": ""
         },
         {
           "name": "submituser",
-          "url": "https://jsonplaceholder.typicode.com/users",
+          "url": "https://jsonplaceholder.typicode.com/posts",
           "method": "POST",
           "headers": {},
           "params": {},
-          "bodyTemplate": "{\n  \"name\": \"Vikas\",\n  \"email\": \"vikas@example.com\"\n}\n",
+          "bodyTemplate": {
+            "title": "Hello World1",
+            "body": "This is my test post",
+            "userId": 14
+          },
           "mappingConfig": {
             "contentType": "application/json",
             "fieldMappings": [
