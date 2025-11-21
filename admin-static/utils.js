@@ -13,16 +13,31 @@
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:10000';
     const dlg = document.createElement('div');
     dlg.className = 'ab-modal';
-    dlg.style.cssText = 'background:linear-gradient(180deg,#071022,#0b1424);color:#e6eef8;padding:16px;border-radius:12px;max-width:900px;width:90%;max-height:80%;overflow:auto;box-shadow:0 10px 30px rgba(2,6,23,0.7)';
+    dlg.style.cssText = 'position:relative;background:linear-gradient(180deg,#071022,#0b1424);color:#e6eef8;padding:16px;border-radius:12px;max-width:900px;width:90%;max-height:80%;overflow:auto;box-shadow:0 10px 30px rgba(2,6,23,0.7)';
     // content and footer are kept as persistent children so we can update body/title without rebuilding the whole dialog
     const titleEl = document.createElement('div'); titleEl.style.cssText='font-weight:700;margin-bottom:8px;';
     const content = document.createElement('div');
     const footer = document.createElement('div'); footer.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:12px';
+    // top-right close button (red with white X)
+    const topClose = document.createElement('button');
+    topClose.className = 'ab-modal-close';
+    topClose.type = 'button';
+    topClose.innerHTML = '\u00D7'; // multiplication sign as X
+    topClose.onclick = hide;
+    // position via CSS class; append to dlg so it's anchored to dialog
+    dlg.appendChild(topClose);
     dlg.appendChild(titleEl);
     dlg.appendChild(content);
     dlg.appendChild(footer);
     overlay.appendChild(dlg);
     document.body.appendChild(overlay);
+
+    // close modal when clicking the overlay background (outside the dialog)
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay){
+        hide();
+      }
+    });
 
     function clearFooter(){ footer.innerHTML = ''; }
 
@@ -35,17 +50,17 @@
       else if(opts.html){ content.innerHTML = opts.html; }
       else if(opts.text){ const pre = document.createElement('pre'); pre.className = 'api-body-pre'; pre.textContent = opts.text; content.appendChild(pre); }
 
-      // footer buttons
+      // footer buttons (only show if explicitly provided)
       clearFooter();
       if(opts.buttons && Array.isArray(opts.buttons)){
         for(const b of opts.buttons){
           const btn = document.createElement('button'); btn.className='btn'; btn.textContent = b.label || 'OK';
           if(b.variant === 'ghost') btn.className = 'btn ghost';
+          if(b.variant === 'danger') btn.className = 'btn danger';
+          if(b.variant === 'success') btn.className = 'btn success';
           btn.onclick = ()=>{ if(b.onClick) b.onClick(); if(b.closeOnClick!==false) hide(); };
           footer.appendChild(btn);
         }
-      } else {
-        const ok = document.createElement('button'); ok.className='btn'; ok.textContent='Close'; ok.onclick = hide; footer.appendChild(ok);
       }
 
       overlay.style.display = 'flex';

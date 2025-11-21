@@ -183,13 +183,32 @@ label, .muted, .small{color:var(--muted)}
 .ab-notify-error{ background: linear-gradient(90deg,#d14343,#8b1f1f); }
 .ab-notify-info{ background: linear-gradient(90deg,#0ea5a4,#2563eb); }
 .ab-notify .btn.ghost{ background: transparent; border: 0; color: rgba(255,255,255,0.85); font-weight:600 }
-.node-children{margin-left:18px;border-left:1px dashed rgba(255,255,255,0.02);padding-left:8px;margin-top:4px}
-.loop-item{padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.04);background:rgba(255,255,255,0.015);margin:6px 0}
 
 /* Ensure Montserrat is used for admin notifications and modals */
 .ab-notify, .ab-notify * , .ab-modal, .ab-modal * {
   font-family: 'Montserrat', Inter, "Segoe UI", Roboto, Arial, system-ui !important;
 }
+
+/* Modal top-right close button */
+.ab-modal-close{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 35px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f87171, #ef4444);
+  color: #fff;
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+.ab-modal-close:hover{ filter: brightness(.95); }
 
 /* Make the variable palette scrollable when content grows and match viewer height */
 #dataPalette{max-height:var(--viewer-height);overflow:auto;padding-right:6px}
