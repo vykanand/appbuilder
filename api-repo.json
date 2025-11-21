@@ -43,6 +43,22 @@
               }
             ]
           }
+        },
+        {
+          "name": "delapi",
+          "url": "https://jsonplaceholder.typicode.com/posts/1",
+          "method": "DELETE",
+          "headers": {},
+          "params": {},
+          "bodyTemplate": ""
+        },
+        {
+          "name": "delApiRaw",
+          "url": "https://jsonplaceholder.typicode.com/posts/1",
+          "method": "DELETE",
+          "headers": {},
+          "params": {},
+          "bodyTemplate": "{   \n\"reason\":\"testingdelete\",   \n\"deletedBy\": \"tester01\"\n }"
         }
       ],
       "mappings": [
@@ -80,6 +96,21 @@
       ],
       "mappings": [],
       "actions": []
+    },
+    {
+      "name": "snack",
+      "apis": [],
+      "mappings": []
+    },
+    {
+      "name": "hashimoto",
+      "apis": [],
+      "mappings": []
+    },
+    {
+      "name": "snackbar",
+      "apis": [],
+      "mappings": []
     }
   ]
 }

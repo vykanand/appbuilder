@@ -46,6 +46,34 @@ function openRestClientModal(apiName, apiDef) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Global error handler to suppress known iframe-related errors
+  const originalConsoleError = console.error;
+  const originalConsoleWarn = console.warn;
+
+  console.error = function(...args) {
+    const message = args.join(' ');
+    // Suppress known third-party script errors from iframe content
+    if (message.includes('avada-order-limit') ||
+        message.includes('Cannot read properties of undefined (reading \'theme\')') ||
+        message.includes('checkouts/internal/preloads.js') ||
+        message.includes('web-pixels-manager-sandbox') ||
+        message.includes('An iframe which has both allow-scripts and allow-same-origin')) {
+      return; // Suppress these known errors from iframe content
+    }
+    // Pass through other errors
+    originalConsoleError.apply(console, args);
+  };
+
+  console.warn = function(...args) {
+    const message = args.join(' ');
+    // Suppress known iframe sandbox warnings
+    if (message.includes('An iframe which has both allow-scripts and allow-same-origin')) {
+      return; // Suppress sandbox warnings
+    }
+    // Pass through other warnings
+    originalConsoleWarn.apply(console, args);
+  };
+
   const apiListEl = qs('#apiList');
   if(apiListEl) {
     apiListEl.addEventListener('click', async (e)=>{
@@ -97,6 +125,27 @@ document.addEventListener('DOMContentLoaded', function() {
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#39;');
       }
+
+      // Insert code at cursor position in page editor
+      function insertCodeAtCursor(code) {
+        const editor = qs('#pageEditor');
+        if (!editor) return;
+
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        const text = editor.value;
+        const before = text.substring(0, start);
+        const after = text.substring(end);
+
+        editor.value = before + code + after;
+        editor.selectionStart = editor.selectionEnd = start + code.length;
+        editor.focus();
+
+        showMessage('Code inserted into editor', 'Success');
+      }
+
+      // Make function globally available
+      window.insertCodeAtCursor = insertCodeAtCursor;
 
       // If AppUtils.Logger is available (utils.js loads before this), wire console methods to it
       if(window.AppUtils && AppUtils.Logger){
@@ -207,10 +256,48 @@ document.addEventListener('DOMContentLoaded', function() {
         await renderSiteDetails();
       }
 
+      async function analyzePageApiRelationships(siteName, apis, pages) {
+        const relationships = {};
+        if (!Array.isArray(pages)) {
+          console.warn('Pages is not an array, skipping analysis:', pages);
+          return relationships;
+        }
+        apis.forEach(api => {
+          relationships[api.name] = [];
+        });
+        for (const page of pages) {
+          try {
+            const content = await api(`/api/sites/${siteName}/pages/content?path=${encodeURIComponent(page)}`);
+            apis.forEach(api => {
+              const apiName = api.name;
+              const url = api.url;
+              const patterns = [
+                new RegExp(`fetch\\(['"\`]${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"\`]`, 'i'),
+                new RegExp(apiName, 'i'),
+                new RegExp(`/${apiName}`, 'i')
+              ];
+              if (patterns.some(p => p.test(content))) {
+                relationships[apiName].push(page);
+              }
+            });
+          } catch (e) {
+            console.warn('Could not load page for analysis', page, e);
+          }
+        }
+        return relationships;
+      }
+
       async function renderSiteDetails(){
         if(!selectedSite) return;
         qs('#siteActions').textContent = `Selected: ${selectedSite.name}`;
         const apiList = qs('#apiList'); apiList.innerHTML='';
+        let relationships = {};
+        try {
+          const pages = await api(`/api/sites/${selectedSite.name}/pages`);
+          relationships = analyzePageApiRelationships(selectedSite.name, selectedSite.apis || [], pages);
+        } catch (e) {
+          console.warn('Could not analyze page-API relationships', e);
+        }
         (selectedSite.apis||[]).forEach(a=>{
           const div = document.createElement('div'); div.className='item';
           const left = document.createElement('div');
@@ -224,7 +311,20 @@ document.addEventListener('DOMContentLoaded', function() {
           left.appendChild(methodBadge);
           left.appendChild(meta);
           const right = document.createElement('div');
-          right.innerHTML = `<button class="btn small outline" data-edit-api="${a.name}">Edit</button> <button class="btn small" data-api="${a.name}">Test</button>`;
+          let buttonsHtml = `<button class="btn small outline" data-edit-api="${a.name}">Edit</button> <button class="btn small" data-api="${a.name}">Test</button>`;
+          if(['POST','PUT','PATCH'].includes(methodText)) {
+            buttonsHtml += ` <button class="btn small success" data-form-builder="${a.name}" data-method="${methodText}">Form Builder</button>`;
+          }
+          right.innerHTML = buttonsHtml;
+
+          // Add page usage info
+          if (relationships[a.name] && relationships[a.name].length > 0) {
+            const pagesDiv = document.createElement('div');
+            pagesDiv.className = 'api-pages';
+            pagesDiv.innerHTML = `<small style="color:#666;margin-top:4px;display:block">Used in: ${relationships[a.name].join(', ')}</small>`;
+            right.appendChild(pagesDiv);
+          }
+
           div.appendChild(left); div.appendChild(right);
           apiList.appendChild(div);
         });
@@ -278,7 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
         try{
           const data = await api(`/api/sites/${selectedSite.name}/data`);
           latestAggregatedData = data || {};
-          renderDataPalette(data || {});
         }catch(e){ console.warn('could not load data palette', e); }
       }
 
@@ -349,162 +448,7 @@ async function testApi(apiDef){
   }catch(err){ AppUtils.Loader.hide(); console.error(err); AppUtils.Modal.show({ title: 'Error', body: escapeHtml(err.message || String(err)) }); }
 }
 
-function renderDataPalette(data){
-  const container = qs('#dataPalette'); if(!container) return; container.innerHTML='';
-  // Render an expandable tree grouped by API root keys.
-  const meta = (data && data.__meta__) || {};
 
-  function renderNode(key, nodeData, parentEl, fullPath, isRoot=false){
-    const row = document.createElement('div'); row.className = 'tree-node';
-    const label = document.createElement('div'); label.className = 'node-label';
-    // mark type for styling: arrays, objects, or value
-    try{
-      if(Array.isArray(nodeData)) label.classList.add('type-array');
-      else if(nodeData && typeof nodeData === 'object') label.classList.add('type-object');
-      else label.classList.add('type-value');
-    }catch(e){}
-    const toggle = document.createElement('span'); toggle.className = 'node-toggle';
-    toggle.textContent = nodeData && (Array.isArray(nodeData) ? '▸' : (nodeData && typeof nodeData === 'object' ? '▸' : ''));
-    label.appendChild(toggle);
-    const text = document.createElement('span'); text.className = 'node-text';
-    // helper to format sample values
-    function displaySample(v){ try{ if(v === null) return 'null'; if(v === undefined) return ''; if(typeof v === 'object') return JSON.stringify(v); return String(v); }catch(e){ return String(v); } }
-    let sampleText = '';
-    if(nodeData !== null && nodeData !== undefined && !Array.isArray(nodeData) && typeof nodeData !== 'object'){
-      sampleText = displaySample(nodeData);
-    } else if(Array.isArray(nodeData)){
-      if(nodeData.length>0){ sampleText = displaySample(nodeData[0]); }
-    } else if(nodeData && typeof nodeData === 'object'){
-      // show small sample of object (first few keys)
-      const keys = Object.keys(nodeData).slice(0,3);
-      if(keys.length) sampleText = '{' + keys.map(k=>`${k}: ${displaySample(nodeData[k])}`).join(', ') + (Object.keys(nodeData).length>3 ? ', …' : '') + '}';
-    }
-    const isTopLevelApi = isRoot || (parentEl && parentEl.classList && parentEl.classList.contains('tree-root'));
-    const keySpan = document.createElement('span');
-    // show method inline for top-level API nodes for clarity while populating the palette
-    if(isTopLevelApi){
-      const m = (meta[key] && meta[key].method) ? meta[key].method.toUpperCase() : '';
-      if(m){
-        const mi = document.createElement('span'); mi.className = 'method-inline'; mi.textContent = m; mi.style.marginRight = '8px'; mi.style.fontWeight = '700'; mi.style.padding = '4px 6px'; mi.style.borderRadius = '6px';
-        // color lightly based on create vs fetch methods
-        if(['POST','PUT','PATCH','DELETE'].includes(m)) { mi.style.background = 'linear-gradient(90deg,#fee2e2,#fecaca)'; mi.style.color = '#4a0b0b'; }
-        else { mi.style.background = 'linear-gradient(90deg,#dcfce7,#bbf7d0)'; mi.style.color = '#07340f'; }
-        label.appendChild(mi);
-      }
-    }
-    keySpan.textContent = key + (Array.isArray(nodeData) ? ' (array)' : (nodeData && typeof nodeData === 'object' ? ' (object)' : ''));
-    label.appendChild(keySpan);
-    
-    // Show API details panel for top-level nodes
-    if(isTopLevelApi && meta[key]){
-      const apiMeta = meta[key];
-      const apiDef = selectedSite && selectedSite.apis ? selectedSite.apis.find(a => a.name === key) : null;
-      const detailsBtn = document.createElement('button');
-      detailsBtn.className = 'btn-icon-mini';
-      detailsBtn.innerHTML = 'ⓘ';
-      detailsBtn.title = 'Show API details';
-      detailsBtn.style.marginLeft = 'auto';
-      detailsBtn.onclick = async (ev) => {
-        ev.stopPropagation();
-        // use stored sample from API definition
-        const apiDef = selectedSite.apis.find(a => a.name === key);
-        const sample = (apiDef && apiDef.bodyTemplate) || nodeData;
-        showApiDetails(key, apiMeta, apiDef, sample);
-      };
-      label.appendChild(detailsBtn);
-    }
-    // If this is a top-level API node, show a method/status badge
-    if(parentEl && parentEl.classList && parentEl.classList.contains('tree-root')){
-      const m = meta[key] || {};
-      const badge = document.createElement('span'); badge.className = 'node-value-badge node-method-badge';
-      const method = (m.method || '').toUpperCase();
-      const status = m.status || '';
-      badge.textContent = method ? `${method}${status ? ' • ' + status : ''}` : (status ? status : '');
-      // add class for fetch vs create methods
-      if(['POST','PUT','PATCH','DELETE'].includes(method)) badge.classList.add('method-create'); else badge.classList.add('method-fetch');
-      label.appendChild(badge);
-    }
-    if(sampleText){ const s = document.createElement('span'); s.className='node-sample'; s.textContent = ` — ${sampleText}`; label.appendChild(s); }
-
-    // drag behavior
-    label.draggable = true;
-    label.addEventListener('dragstart', (e)=>{
-      // build a richer payload: if top-level API, include apiName and method and sample fields
-      const isTop = parentEl && parentEl.classList && parentEl.classList.contains('tree-root');
-      let payload = { apiPath: fullPath, type: Array.isArray(nodeData) ? 'array' : (nodeData && typeof nodeData === 'object' ? 'object' : 'value') };
-      if(isTop){
-        const m = meta[key] || {};
-        // include sample data for fields if available
-        let sample = nodeData;
-        if(Array.isArray(nodeData)) sample = nodeData.length>0 ? nodeData[0] : {};
-        const fields = (sample && typeof sample === 'object') ? Object.keys(sample) : [];
-        // if the api has a saved mappingConfig, prefer those mapped request field names
-        let mappingConfig = null;
-        try{ if(selectedSite && selectedSite.apis){ const ad = selectedSite.apis.find(a=>a.name===key); if(ad && ad.mappingConfig) mappingConfig = ad.mappingConfig; } }catch(e){}
-        if(mappingConfig && Array.isArray(mappingConfig.fieldMappings) && mappingConfig.fieldMappings.length){
-          const mappedFields = mappingConfig.fieldMappings.map(fm=>fm.requestField);
-          // include sample from stored API definition
-          let includeSample = null;
-          try {
-            const apiDef = selectedSite.apis.find(a => a.name === key);
-            if (apiDef && apiDef.bodyTemplate) {
-              includeSample = apiDef.bodyTemplate;
-            }
-          } catch (e) {}
-          payload = Object.assign(payload, { apiName: key, method: (m.method || 'GET').toUpperCase(), url: (m.url||''), fields: mappedFields, mappingConfig, sample: includeSample });
-        } else {
-          // include sample from stored API definition
-          let includeSample = null;
-          try {
-            const apiDef = selectedSite.apis.find(a => a.name === key);
-            if (apiDef && apiDef.bodyTemplate) {
-              includeSample = apiDef.bodyTemplate;
-            }
-          } catch (e) {}
-          payload = Object.assign(payload, { apiName: key, method: (m.method || 'GET').toUpperCase(), url: (m.url||''), fields, sample: includeSample });
-        }
-      }
-      console.log('Drag start for', key, payload);
-      e.dataTransfer.setData('application/json', JSON.stringify(payload));
-      // also set text/plain for fallback / template insertion
-      if(payload.type === 'array') e.dataTransfer.setData('text/plain', `{{#each ${fullPath}}}`);
-      else e.dataTransfer.setData('text/plain', `{{${fullPath}}}`);
-    });
-
-    row.appendChild(label);
-    parentEl.appendChild(row);
-
-    if(nodeData && typeof nodeData === 'object'){
-      const childrenWrap = document.createElement('div'); childrenWrap.className = 'node-children';
-      childrenWrap.style.display = 'none';
-      row.appendChild(childrenWrap);
-      toggle.style.cursor = 'pointer';
-      toggle.onclick = (ev)=>{ ev.stopPropagation(); childrenWrap.style.display = childrenWrap.style.display === 'none' ? 'block' : 'none'; toggle.textContent = childrenWrap.style.display === 'none' ? '▸' : '▾'; };
-
-      if(Array.isArray(nodeData)){
-        // if array of objects, render keys from first element as available fields
-        if(nodeData.length > 0 && typeof nodeData[0] === 'object'){
-          for(const k of Object.keys(nodeData[0])){
-            renderNode(k, nodeData[0][k], childrenWrap, fullPath + '.' + k, false);
-          }
-        }
-      } else {
-        for(const k of Object.keys(nodeData)){
-          renderNode(k, nodeData[k], childrenWrap, fullPath ? `${fullPath}.${k}` : k, false);
-        }
-      }
-    }
-  }
-
-  container.classList.add('data-tree');
-  container.innerHTML = '';
-  for(const apiName of Object.keys(data||{})){
-    if(apiName === '__meta__') continue;
-    const rootWrap = document.createElement('div'); rootWrap.className = 'tree-root';
-    renderNode(apiName, data[apiName], rootWrap, apiName, true);
-    container.appendChild(rootWrap);
-  }
-}
 
 // Open mapping modal to let user pick response fields -> request fields and content type
 function openApiMappingModal(apiName, apiDef, sample){
@@ -746,7 +690,6 @@ function openApiMappingModal(apiName, apiDef, sample){
         if(!resp.ok) { const txt = await resp.text(); throw new Error(txt || 'Save failed'); }
         const updated = await resp.json();
         if(selectedSite && selectedSite.apis){ const idx = selectedSite.apis.findIndex(a=>a.name===apiName); if(idx>=0) selectedSite.apis[idx] = updated; }
-        try{ renderDataPalette(latestAggregatedData); }catch(e){}
         AppUtils.Modal.hide && AppUtils.Modal.hide();
         showMessage('Mapping saved', 'Saved');
       }catch(err){ AppUtils.Loader.hide(); console.error(err); showMessage('Could not save mapping: ' + (err && err.message ? err.message : ''),'Error'); }
@@ -1350,6 +1293,27 @@ if(apiListEl) {
       openRestClientModal('New API', {});
       return;
     }
+    // Form Builder button
+    const formBuilder = btn.dataset.formBuilder;
+    if(formBuilder){
+      if(!selectedSite){ showMessage('Select a site first','Error'); return; }
+      const method = btn.dataset.method || 'POST';
+      // Store API data in sessionStorage for the form builder
+      const apiDef = (selectedSite.apis||[]).find(a=>a.name===formBuilder);
+      if(apiDef){
+        sessionStorage.setItem('formBuilderAPI', JSON.stringify({
+          api: apiDef,
+          method: method,
+          siteName: selectedSite.name
+        }));
+        const formBuilderUrl = `/admin-static/form-builder.html`;
+        window.open(formBuilderUrl, '_blank');
+        showMessage(`Opened form builder for ${formBuilder}`, 'Form Builder opened');
+      } else {
+        showMessage('API not found', 'Error');
+      }
+      return;
+    }
   });
 }
 
@@ -1384,8 +1348,53 @@ const searchInput = qs('#searchInput'); if(searchInput) searchInput.addEventList
 // initial load
 loadSites();
 
-// Open visual editor button
-const openVisualBtn = qs('#openVisualEditor'); if(openVisualBtn) openVisualBtn.addEventListener('click', ()=> openVisualEditor());
+  // Open custom builder button
+  const openCustomBuilderBtn = qs('#openCustomBuilder');
+  if(openCustomBuilderBtn) openCustomBuilderBtn.addEventListener('click', () => {
+    if(!selectedSite) { showMessage('Select a site first', 'Error'); return; }
+    sessionStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+    window.open('/custom-builder.html', '_blank');
+  });// Open form builder button
+const openFormBuilderBtn = qs('#openFormBuilder'); if(openFormBuilderBtn) openFormBuilderBtn.addEventListener('click', ()=> {
+  if(!selectedSite){ showMessage('Select a site first','Error'); return; }
+  const currentPage = qs('#pageSelect').value;
+  if(!currentPage){ showMessage('Open a page first','Error'); return; }
+  
+  const apis = selectedSite.apis || [];
+  if(apis.length === 0){ showMessage('No APIs configured. Add an API first.','Notice'); return; }
+  
+  // Show selector if multiple APIs
+  if(apis.length === 1){
+    const apiDef = apis[0];
+    openFormBuilderForAPI(apiDef, currentPage);
+  } else {
+    const options = apis.map(a => `<option value="${a.name}">${a.name} (${(a.method||'GET').toUpperCase()})</option>`).join('');
+    const html = `<div style=\"padding:12px\"><label style=\"display:block;margin-bottom:8px;font-weight:600\">Select API for Form Builder:</label><select id=\"formBuilderApiSelect\" style=\"width:100%;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)\">${options}</select><button id=\"formBuilderOpenBtn\" class=\"btn\" style=\"margin-top:12px;width:100%\">Open Form Builder</button></div>`;
+    AppUtils.Modal.show({ title: 'Select API', body: html });
+    setTimeout(() => {
+      const btn = document.getElementById('formBuilderOpenBtn');
+      if(btn) btn.onclick = () => {
+        const sel = document.getElementById('formBuilderApiSelect');
+        const apiName = sel ? sel.value : apis[0].name;
+        const apiDef = apis.find(a => a.name === apiName);
+        openFormBuilderForAPI(apiDef, currentPage);
+      };
+    }, 100);
+  }
+});
+
+function openFormBuilderForAPI(apiDef, pageName) {
+  // Store API data in sessionStorage for the form builder
+  sessionStorage.setItem('formBuilderAPI', JSON.stringify({
+    api: apiDef,
+    method: apiDef.method || 'POST',
+    siteName: selectedSite.name,
+    page: pageName
+  }));
+  const formBuilderUrl = `/admin-static/form-builder.html`;
+  window.open(formBuilderUrl, '_blank');
+  showMessage(`Opened form builder for ${apiDef.name} on page ${pageName}`, 'Form Builder opened');
+}
 
 // Open field mapper button
 const openFieldMapperBtn = qs('#openFieldMapper'); 

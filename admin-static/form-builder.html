@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Form Builder - AppBuilder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 100px);
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+
+        .api-panel {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .pages-panel {
+            flex: 1;
+            max-width: 250px;
+        }
+
+        .form-panel {
+            flex: 2;
+        }
+
+        .preview-panel {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .api-item {
+            background: #ecf0f1;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: grab;
+            border: 2px solid transparent;
+        }
+
+        .api-item:hover {
+            background: #d5dbdb;
+        }
+
+        .api-item.dragging {
+            opacity: 0.5;
+        }
+
+        .form-canvas {
+            min-height: 400px;
+            max-height: 600px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 4px;
+            padding: 20px;
+            background: #fafafa;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .form-canvas.full-page {
+            padding: 10px;
+        }
+
+        .form-canvas.full-page * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-element {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .form-element.drop-target {
+            border-color: #e74c3c;
+            background: #ffeaea;
+        }
+
+        .mapped {
+            border-color: #27ae60 !important;
+            background: #e8f5e8 !important;
+        }
+
+        .mapping-line {
+            position: absolute;
+            height: 2px;
+            background: #27ae60;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .mapping-preview {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.danger {
+            background: #e74c3c;
+        }
+
+        .btn.success {
+            background: #27ae60;
+        }
+
+        .submit-buttons {
+            margin: 15px 0;
+        }
+
+        .submit-button-option {
+            background: #ecf0f1;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .submit-button-option.selected {
+            border-color: #3498db;
+            background: #d5e8f7;
+        }
+
+        .code-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Custom Form Builder</h1>
+        <p>Drag API inputs to form elements and generate submission code</p>
+    </div>
+
+    <div class="container">
+        <div class="panel api-panel">
+            <h3>API Inputs</h3>
+            <div id="apiInputs"></div>
+        </div>
+
+        <div class="panel pages-panel">
+            <h3>Pages Using This API</h3>
+            <div id="pagesList"></div>
+            <div id="pageSelector" style="display: none;">
+                <h4>Select a Page:</h4>
+                <select id="pageSelect" onchange="loadPageContent(this.value)">
+                    <option value="">Choose a page...</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel form-panel">
+            <h3>Form Canvas</h3>
+            <div class="form-canvas" id="formCanvas">
+                <p style="color: #7f8c8d; text-align: center; margin-top: 180px;">
+                    Paste your HTML form code here or drag form elements
+                </p>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn" onclick="loadFormFromClipboard()">Load Form from Clipboard</button>
+                <button class="btn" onclick="clearForm()">Clear Form</button>
+            </div>
+        </div>
+
+        <div class="panel preview-panel">
+            <h3>Live Preview & Generate</h3>
+            <div id="mappingPreview"></div>
+
+            <div class="submit-buttons">
+                <h4>Choose Submit Button:</h4>
+                <div id="submitButtons"></div>
+            </div>
+
+            <button class="btn success" onclick="generateCode()" style="width: 100%;">Generate Form Code</button>
+
+            <div id="codeOutput" style="display: none;">
+                <h4>Generated Code:</h4>
+                <div class="code-output" id="generatedCode"></div>
+                <button class="btn" onclick="copyCode()">Copy Code</button>
+                <button class="btn danger" onclick="closeCodeOutput()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAPI = null;
+        let mappings = {};
+        let draggedElement = null;
+        let selectedSubmitButton = null;
+
+        // Global error handler for debugging
+        window.addEventListener('error', function(e) {
+            console.error('Form Builder Error:', e.error);
+            console.error('Error details:', e);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Form Builder Unhandled Rejection:', e.reason);
+            console.error('Rejection details:', e);
+            e.preventDefault(); // Prevent the default browser behavior
+        });
+
+        // Global validation function
+        function validateSiteContext() {
+            if (!window.currentSiteName || typeof window.currentSiteName !== 'string' || window.currentSiteName.trim() === '') {
+                console.error('Site context validation failed: currentSiteName is invalid');
+                alert('Form builder is not properly initialized. Please reopen from the admin panel.');
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize from sessionStorage or URL params
+        window.onload = function() {
+            try {
+                const storedData = sessionStorage.getItem('formBuilderAPI');
+                if (storedData) {
+                    console.log('Loading API data from sessionStorage');
+                    console.log('Raw stored data:', storedData);
+                    const data = JSON.parse(storedData);
+                    console.log('Parsed data:', data);
+
+                    // Validate the data structure
+                    if (!data.api || !data.method || !data.siteName) {
+                        throw new Error('Invalid sessionStorage data structure: missing api, method, or siteName');
+                    }
+
+                    // Validate siteName is not empty or undefined
+                    if (!data.siteName || typeof data.siteName !== 'string' || data.siteName.trim() === '') {
+                        throw new Error('Invalid siteName in sessionStorage data');
+                    }
+
+                    // Store site name BEFORE calling loadAPI
+                    window.currentSiteName = data.siteName.trim();
+                    window.currentPage = data.page;
+
+                    loadAPI(data.api, data.method);
+                    // Clear the stored data
+                    sessionStorage.removeItem('formBuilderAPI');
+                } else {
+                    // Try URL parameters as fallback
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const apiName = urlParams.get('api');
+                    const method = urlParams.get('method');
+                    const siteName = urlParams.get('site');
+                    const pageName = urlParams.get('page');
+
+                    if (apiName && method && siteName) {
+                        console.log('Loading API data from URL parameters');
+                        // Validate siteName
+                        if (!siteName || typeof siteName !== 'string' || siteName.trim() === '') {
+                            throw new Error('Invalid site name from URL parameters');
+                        }
+
+                        // Fetch API data from server
+                        fetch(`/api/sites/${encodeURIComponent(siteName.trim())}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                }
+                                return response.json();
+                            })
+                            .then(siteData => {
+                                const api = siteData.apis.find(a => a.name === apiName);
+                                if (api) {
+                                    // Set site name BEFORE calling loadAPI
+                                    window.currentSiteName = siteName.trim();
+                                    window.currentPage = pageName;
+                                    loadAPI(api, method);
+                                } else {
+                                    throw new Error('API not found in site data');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error loading API from URL:', error);
+                                alert(`Error loading API data: ${error.message}`);
+                            });
+                    } else {
+                        console.warn('No API data found in sessionStorage or URL parameters');
+                        alert('No API data found. Please open the form builder from the admin panel.');
+                    }
+                }
+            } catch (e) {
+                console.error('Error in window.onload:', e);
+                console.error('Error details:', e.stack);
+                alert(`Error initializing form builder: ${e.message}`);
+            }
+        };        function loadAPI(api, method) {
+            currentAPI = { name: api.name, method: method, inputs: api.bodyTemplate || {} };
+            displayAPIInputs();
+            
+            // Load pages for this API - displayPagesList will auto-load the first page if available
+            loadPagesForAPI();
+        }
+
+        function loadExistingMappings(page, apiName) {
+            if (!validateSiteContext()) return;
+
+            console.log('Loading existing mappings for', page, apiName);
+            fetch(`/api/sites/${encodeURIComponent(window.currentSiteName)}/pages/${encodeURIComponent(page)}/api/${encodeURIComponent(apiName)}/mapping`)
+                .then(response => {
+                    console.log('Mapping response status:', response.status);
+                    if (response.status === 404) {
+                        console.log('No existing mapping found');
+                        // No existing mapping, that's fine
+                        return null;
+                    }
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(mapping => {
+                    console.log('Loaded mapping:', mapping);
+                    if (mapping && mapping.fieldMappings) {
+                        // Load existing field mappings
+                        Object.keys(mapping.fieldMappings).forEach(field => {
+                            const selector = mapping.fieldMappings[field];
+                            console.log('Looking for element with selector:', selector);
+                            const element = document.querySelector(selector);
+                            console.log('Found element:', element);
+                            if (element) {
+                                // Create mapping for this field directly
+                                createMapping(field, element);
+                                console.log('Created mapping for field:', field);
+                            } else {
+                                console.log('Element not found for selector:', selector);
+                            }
+                        });
+
+                        // Set submit button if it exists
+                        if (mapping.submitSelector) {
+                            console.log('Setting submit button with selector:', mapping.submitSelector);
+                            selectedSubmitButton = document.querySelector(mapping.submitSelector);
+                            console.log('Selected submit button:', selectedSubmitButton);
+                        }
+
+                        // Update UI to reflect loaded mappings
+                        updateMappingPreview();
+                        updateSubmitButtons();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading existing mappings:', error);
+                    // Don't show alert for 404 errors as they're expected when no mappings exist
+                    if (!error.message.includes('404')) {
+                        alert(`Error loading existing mappings: ${error.message}`);
+                    }
+                });
+        }
+
+        function loadPagesForAPI() {
+            if (!currentAPI || !validateSiteContext()) {
+                console.warn('Cannot load pages: missing currentAPI or invalid site context');
+                return;
+            }
+
+            fetch(`/api/sites/${encodeURIComponent(window.currentSiteName)}/api/${encodeURIComponent(currentAPI.name)}/pages`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(pages => {
+                    displayPagesList(pages);
+                })
+                .catch(error => {
+                    console.error('Error loading pages:', error);
+                    showPageSelector();
+                });
+        }
+
+        function displayPagesList(pages) {
+            const container = document.getElementById('pagesList');
+            const selector = document.getElementById('pageSelector');
+            
+            if (pages && pages.length > 0) {
+                container.innerHTML = '<h4>Pages with this API:</h4>';
+                pages.forEach(page => {
+                    const div = document.createElement('div');
+                    div.className = 'api-item';
+                    if (page === window.currentPage) {
+                        div.className += ' mapped'; // Highlight current page
+                        div.innerHTML = `<strong>${page}</strong> <small>(current)</small>`;
+                    } else {
+                        div.textContent = page;
+                    }
+                    div.onclick = () => loadPageContent(page);
+                    container.appendChild(div);
+                });
+
+                // Automatically load the first page if no current page is set
+                if (!window.currentPage && pages.length > 0) {
+                    console.log('Auto-loading first page with mappings:', pages[0]);
+                    window.currentPage = pages[0];
+                    loadPageContent(pages[0]).then(() => {
+                        loadExistingMappings(pages[0], currentAPI.name);
+                    });
+                }
+
+                selector.style.display = 'none';
+            } else {
+                container.innerHTML = '<p>No pages currently use this API.</p>';
+                showPageSelector();
+            }
+        }
+
+        function showPageSelector() {
+            if (!validateSiteContext()) return;
+
+            const selector = document.getElementById('pageSelector');
+            const select = document.getElementById('pageSelect');
+
+            // Load available pages
+            fetch(`/api/sites/${encodeURIComponent(window.currentSiteName)}/pages`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(pages => {
+                    select.innerHTML = '<option value="">Choose a page...</option>';
+                    pages.forEach(page => {
+                        const option = document.createElement('option');
+                        option.value = page;
+                        option.textContent = page;
+                        if (page === window.currentPage) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading available pages:', error);
+                    alert(`Error loading pages: ${error.message}`);
+                });
+
+            selector.style.display = 'block';
+        }
+
+        function loadPageContent(pageName) {
+            if (!pageName) return Promise.resolve();
+
+            // Set the current page
+            window.currentPage = pageName;
+
+            if (!validateSiteContext()) {
+                return Promise.reject(new Error('Invalid site context'));
+            }
+
+            return fetch(`/api/sites/${encodeURIComponent(window.currentSiteName)}/pages/${encodeURIComponent(pageName)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    // Parse the HTML and extract the body content
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const body = doc.body;
+
+                    if (body) {
+                        // Remove scripts and styles to avoid conflicts with form builder
+                        const scripts = body.querySelectorAll('script');
+                        const styles = body.querySelectorAll('style, link[rel="stylesheet"]');
+                        scripts.forEach(script => script.remove());
+                        styles.forEach(style => style.remove());
+
+                        // Load the entire body content
+                        formCanvas.innerHTML = body.innerHTML;
+                        formCanvas.classList.add('full-page');
+                        updateSubmitButtons();
+                        attachFormEvents();
+
+                        // Load existing mappings for this page and API
+                        loadExistingMappings(pageName, currentAPI.name);
+                    } else {
+                        throw new Error('No body content found in the selected page');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading page content:', error);
+                    alert(`Error loading page content: ${error.message}`);
+                });
+        }
+
+        function displayAPIInputs() {
+            const container = document.getElementById('apiInputs');
+            container.innerHTML = '';
+
+            if (!currentAPI || !currentAPI.inputs) return;
+
+            Object.keys(currentAPI.inputs).forEach(field => {
+                const value = currentAPI.inputs[field];
+                const div = document.createElement('div');
+                div.className = 'api-item';
+                div.draggable = true;
+                div.dataset.field = field;
+                div.dataset.value = value;
+
+                div.innerHTML = `
+                    <strong>${field}</strong><br>
+                    <small>Type: ${typeof value} | Value: ${value}</small>
+                `;
+
+                div.addEventListener('dragstart', handleDragStart);
+                container.appendChild(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', e.target.dataset.field);
+        }
+
+        function handleDragEnd(e) {
+            if (draggedElement) {
+                draggedElement.classList.remove('dragging');
+            }
+            draggedElement = null;
+            clearDropTargets();
+        }
+
+        function clearDropTargets() {
+            document.querySelectorAll('.drop-target').forEach(el => {
+                el.classList.remove('drop-target');
+            });
+        }
+
+        // Form canvas drag and drop
+        const formCanvas = document.getElementById('formCanvas');
+
+        formCanvas.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            if (draggedElement && draggedElement.classList.contains('api-item')) {
+                const target = getDropTarget(e.target);
+                if (target) {
+                    target.classList.add('drop-target');
+                }
+            }
+        });
+
+        formCanvas.addEventListener('dragleave', clearDropTargets);
+
+        formCanvas.addEventListener('drop', function(e) {
+            e.preventDefault();
+            clearDropTargets();
+
+            if (!draggedElement || !draggedElement.classList.contains('api-item')) return;
+
+            const field = draggedElement.dataset.field;
+            const target = getDropTarget(e.target);
+
+            if (target) {
+                createMapping(field, target);
+            }
+        });
+
+        function getDropTarget(element) {
+            // Find the closest form input element
+            let target = element;
+            while (target && target !== formCanvas) {
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+                    return target;
+                }
+                target = target.parentElement;
+            }
+            return null;
+        }
+
+        function createMapping(field, target) {
+            mappings[field] = {
+                element: target,
+                selector: getElementSelector(target)
+            };
+
+            target.classList.add('mapped');
+            updateMappingPreview();
+            updateSubmitButtons();
+        }
+
+        function getElementSelector(element) {
+            try {
+                if (element.id) return '#' + element.id;
+                if (element.name) return `[name="${element.name.replace(/"/g, '\\"')}"]`;
+                if (element.className && typeof element.className === 'string') {
+                    const className = element.className.split(' ')[0];
+                    if (className) return '.' + className;
+                }
+
+                // Create a unique selector
+                let selector = element.tagName.toLowerCase();
+                if (element.type) selector += `[type="${element.type}"]`;
+                return selector;
+            } catch (e) {
+                console.error('Error creating element selector:', e);
+                return '[data-invalid-selector]';
+            }
+        }
+
+        function updateMappingPreview() {
+            const preview = document.getElementById('mappingPreview');
+            preview.innerHTML = '<h4>Mappings:</h4>';
+
+            Object.keys(mappings).forEach(field => {
+                const mapping = mappings[field];
+                const div = document.createElement('div');
+                div.className = 'mapping-preview';
+                div.innerHTML = `
+                    <strong>${field}</strong> → ${mapping.selector}<br>
+                    <small>Current value: "${mapping.element.value || '(empty)'}"</small>
+                `;
+                preview.appendChild(div);
+            });
+        }
+
+        function updateSubmitButtons() {
+            const container = document.getElementById('submitButtons');
+            container.innerHTML = '';
+
+            const submitElements = formCanvas.querySelectorAll('input[type="submit"], button[type="submit"], button:not([type]), input[type="button"], button[type="button"]');
+
+            submitElements.forEach((btn, index) => {
+                const div = document.createElement('div');
+                div.className = 'submit-button-option';
+                div.dataset.index = index;
+                div.textContent = `${btn.tagName}${btn.type ? `[${btn.type}]` : ''}: "${btn.value || btn.textContent || 'Submit'}"`;
+                
+                // Check if this button is the currently selected one
+                if (selectedSubmitButton && (selectedSubmitButton === btn || selectedSubmitButton.isSameNode(btn))) {
+                    div.classList.add('selected');
+                }
+                
+                div.onclick = () => selectSubmitButton(btn, div);
+                container.appendChild(div);
+            });
+        }
+
+        function selectSubmitButton(button, element) {
+            selectedSubmitButton = button;
+            document.querySelectorAll('.submit-button-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function loadFormFromClipboard() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    formCanvas.innerHTML = text;
+                    formCanvas.classList.remove('full-page');
+                    updateSubmitButtons();
+                    attachFormEvents();
+                })
+                .catch(err => {
+                    console.error('Error reading clipboard:', err);
+                    alert('Could not read clipboard. Please paste HTML directly.');
+                });
+        }
+
+        function clearForm() {
+            formCanvas.innerHTML = '<p style="color: #7f8c8d; text-align: center; margin-top: 180px;">Paste your HTML form code here or drag form elements</p>';
+            formCanvas.classList.remove('full-page');
+            mappings = {};
+            selectedSubmitButton = null;
+            updateMappingPreview();
+            updateSubmitButtons();
+        }
+
+        function attachFormEvents() {
+            // Re-attach drag events to new form elements
+            formCanvas.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+        }
+
+        function generateCode() {
+            try {
+                if (!selectedSubmitButton) {
+                    alert('Please select a submit button first.');
+                    return;
+                }
+
+                if (Object.keys(mappings).length === 0) {
+                    alert('Please create at least one mapping first.');
+                    return;
+                }
+
+                if (!currentAPI) {
+                    alert('No API loaded. Please reload the form builder.');
+                    return;
+                }
+
+                const code = generateSubmissionScript();
+                document.getElementById('generatedCode').textContent = code;
+                document.getElementById('codeOutput').style.display = 'block';
+
+                // Also save the action to track page-API relationship
+                saveActionForPage();
+            } catch (e) {
+                console.error('Error in generateCode:', e);
+                alert(`Error generating code: ${e.message}`);
+            }
+        }
+
+        function saveActionForPage() {
+            if (!selectedSubmitButton || !currentAPI) {
+                console.warn('Cannot save action: missing submit button or API');
+                return;
+            }
+
+            if (!validateSiteContext()) return;
+
+            // Ensure we have a current page set
+            if (!window.currentPage) {
+                console.warn('No current page set, cannot save page mappings');
+                alert('Please select a page first before generating code.');
+                return;
+            }
+
+            const submitSelector = getElementSelector(selectedSubmitButton);
+            const fields = Object.keys(mappings);
+
+            // Save action for runtime execution
+            fetch(`/api/sites/${encodeURIComponent(window.currentSiteName)}/actions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    selector: submitSelector,
+                    apiName: currentAPI.name,
+                    method: currentAPI.method,
+                    fields: fields,
+                    page: window.currentPage
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(action => {
+                console.log('Action saved:', action);
+
+                // Also save/update page mapping for form builder persistence
+                const fieldMappings = {};
+                Object.keys(mappings).forEach(field => {
+                    fieldMappings[field] = mappings[field].selector;
+                });
+
+                return fetch(`/api/sites/${encodeURIComponent(window.currentSiteName)}/page-mappings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        page: window.currentPage,
+                        apiName: currentAPI.name,
+                        method: currentAPI.method,
+                        fieldMappings: fieldMappings,
+                        submitSelector: submitSelector
+                    })
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(mapping => {
+                console.log('Page mapping saved:', mapping);
+                // Refresh the pages list to show the new relationship
+                loadPagesForAPI();
+            })
+            .catch(error => {
+                console.error('Error saving mappings:', error);
+                alert(`Error saving mappings: ${error.message}`);
+            });
+        }
+
+        function generateSubmissionScript() {
+            try {
+                const submitSelector = getElementSelector(selectedSubmitButton);
+                const apiName = currentAPI.name;
+                const method = currentAPI.method;
+
+                let code = `// Form submission code for ${method} ${apiName}\n`;
+                code += `document.querySelector('${submitSelector.replace(/'/g, "\\'")}').addEventListener('click', function(e) {\n`;
+                code += `  e.preventDefault();\n`;
+                code += `  \n`;
+                code += `  var formData = {};\n`;
+
+                Object.keys(mappings).forEach(field => {
+                    const selector = mappings[field].selector;
+                    const element = mappings[field].element;
+                    const inputType = element.type;
+
+                    if (inputType === 'checkbox') {
+                        code += `  formData.${field} = document.querySelector('${selector.replace(/'/g, "\\'")}').checked;\n`;
+                    } else {
+                        code += `  formData.${field} = document.querySelector('${selector.replace(/'/g, "\\'")}').value;\n`;
+                    }
+                });
+
+                code += `  \n`;
+                code += `  // Submit to API\n`;
+                code += `  fetch('/api/sites/${getCurrentSite()}/endpoints/${encodeURIComponent(apiName)}/execute', {\n`;
+                code += `    method: '${method}',\n`;
+                code += `    headers: { 'Content-Type': 'application/json' },\n`;
+                code += `    body: JSON.stringify(formData)\n`;
+                code += `  })\n`;
+                code += `  .then(response => response.json())\n`;
+                code += `  .then(data => {\n`;
+                code += `    console.log('Success:', data);\n`;
+                code += `    alert('Form submitted successfully!');\n`;
+                code += `  })\n`;
+                code += `  .catch(error => {\n`;
+                code += `    console.error('Error:', error);\n`;
+                code += `    alert('Error submitting form');\n`;
+                code += `  });\n`;
+                code += `});\n`;
+
+                return code;
+            } catch (e) {
+                console.error('Error generating submission script:', e);
+                return `// Error generating code: ${e.message}\nconsole.error('Code generation failed');`;
+            }
+        }
+
+        function getCurrentSite() {
+            if (!window.currentSiteName) {
+                console.error('getCurrentSite called but currentSiteName is not set');
+                return 'demo'; // fallback
+            }
+            return window.currentSiteName;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('generatedCode').textContent;
+
+            // Try to insert code back into parent editor
+            if (window.parent && window.parent.insertCodeAtCursor) {
+                try {
+                    window.parent.insertCodeAtCursor(code);
+                    alert('Code inserted into editor!');
+                    window.close();
+                    return;
+                } catch (e) {
+                    console.error('Error inserting code into parent editor:', e);
+                }
+            }
+
+            // Fallback to clipboard
+            navigator.clipboard.writeText(code)
+                .then(() => {
+                    alert('Code copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Error copying to clipboard:', err);
+                    alert('Could not copy to clipboard. Please copy the code manually.');
+                });
+        }
+
+        function closeCodeOutput() {
+            document.getElementById('codeOutput').style.display = 'none';
+        }
+
+        // Global drag events
+        document.addEventListener('dragend', handleDragEnd);
+    </script>
+</body>
+</html>

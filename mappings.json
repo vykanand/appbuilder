@@ -1,0 +1,123 @@
+{
+  "sites": {
+    "demo": {
+      "actions": [
+        {
+          "id": "action_mi8sylxe",
+          "selector": "button[type=\"submit\"]",
+          "apiName": "submituser",
+          "method": "POST",
+          "fields": [
+            "userId",
+            "body",
+            "title"
+          ],
+          "page": null
+        },
+        {
+          "id": "action_mi8t1iw3",
+          "selector": "button[type=\"submit\"]",
+          "apiName": "submituser",
+          "method": "POST",
+          "fields": [
+            "title",
+            "body",
+            "userId"
+          ],
+          "page": null
+        },
+        {
+          "id": "action_mi8t4833",
+          "selector": "button[type=\"submit\"]",
+          "apiName": "submituser",
+          "method": "POST",
+          "fields": [
+            "title",
+            "body",
+            "userId"
+          ],
+          "page": null
+        },
+        {
+          "id": "action_mi8t7zh6",
+          "selector": "button[type=\"submit\"]",
+          "apiName": "submituser",
+          "method": "POST",
+          "fields": [
+            "title",
+            "body",
+            "userId"
+          ],
+          "page": null
+        },
+        {
+          "id": "action_mi8t9kgh",
+          "selector": "button[type=\"submit\"]",
+          "apiName": "submituser",
+          "method": "POST",
+          "fields": [
+            "title",
+            "body",
+            "userId"
+          ],
+          "page": "index.html"
+        }
+      ],
+      "mappings": [],
+      "pageMappings": [
+        {
+          "id": "pm_mi8t9kgv",
+          "page": "index.html",
+          "apiName": "submituser",
+          "method": "POST",
+          "fieldMappings": {
+            "title": "[name=\"title\"]",
+            "body": "[name=\"body\"]",
+            "userId": "[name=\"userId\"]"
+          },
+          "submitSelector": "button[type=\"submit\"]"
+        },
+        {
+          "id": "pm_mi983jez",
+          "page": "pp_clean.html",
+          "apiName": "userlist",
+          "method": "GET",
+          "fieldMappings": {},
+          "submitSelector": "#abget_mi98c70r_ixcw_btn"
+        },
+        {
+          "id": "pm_mi98idmz",
+          "page": "index.html",
+          "apiName": "userlist",
+          "method": "GET",
+          "fieldMappings": {},
+          "submitSelector": null
+        },
+        {
+          "id": "pm_mi9aayuu",
+          "page": "index.html",
+          "apiName": "userApi",
+          "method": "GET",
+          "fieldMappings": {},
+          "submitSelector": null
+        },
+        {
+          "id": "pm_mi9ah7ui",
+          "page": "index.html",
+          "apiName": "delapi",
+          "method": "DELETE",
+          "fieldMappings": {},
+          "submitSelector": "#abdel_mi9ah7u6_n1tv"
+        },
+        {
+          "id": "pm_mi9al8z0",
+          "page": "index.html",
+          "apiName": "delApiRaw",
+          "method": "DELETE",
+          "fieldMappings": {},
+          "submitSelector": "#abdel_mi9al8ym_b0pa"
+        }
+      ]
+    }
+  }
+}

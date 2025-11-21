@@ -56,6 +56,7 @@
           </div>
           <div class="top-actions">
             <a id="previewLink" class="btn outline" target="_blank" href="#">Open Preview</a>
+            <button id="openCustomBuilder" class="btn">Open Custom Builder</button>
           </div>
         </header>
 
@@ -108,53 +109,17 @@
             <div class="card" id="cardPreview" data-intro="Preview your live site in an iframe. Click preview to open full tab.">
               <h3>Live Preview</h3>
               <div class="muted">Live preview of selected site's page. It updates on save.</div>
+              <div class="muted small" style="margin-bottom:8px;color:#64748b;font-style:italic;">
+                ℹ️ Console errors shown below are from the website content, not the admin panel
+              </div>
               <div class="preview-wrap light-bg" style="margin-top:8px">
-                <iframe id="previewFrame" src="about:blank"></iframe>
+                <iframe id="previewFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
               </div>
-            </div>
-          </div>
-              <div class="card" id="cardPages" data-intro="Edit pages in-place. Drag variables from the palette into the editor.">
-                <h3>Pages & Editor</h3>
-                <div class="muted">Open a page, edit HTML, insert variables from the palette, and save.</div>
-                <div class="two-col" style="margin-top:10px;gap:12px">
-                  <select id="pageSelect" style="flex:1"></select>
-                  <button id="loadPageBtn" class="btn">Open</button>
-                  <button id="openVisualEditor" class="btn outline">Open Visual Editor</button>
-                  <button id="openFieldMapper" class="btn outline">Field Mapper</button>
-                </div>
-                <div class="divider"></div>
-                <div style="display:flex;gap:12px">
-                    <div style="flex:1;min-width:360px">
-                    <div class="muted small">HTML Editor</div>
-                    <textarea id="pageEditor" style="width:100%;border-radius:8px;margin-top:8px;padding:12px;font-family:Consolas,monospace;"> </textarea>
-                    <div style="display:flex;gap:8px;margin-top:8px"><button id="savePageBtn" class="btn">Save Page</button><button id="previewRenderedBtn" class="btn outline">Preview Rendered</button></div>
-                  </div>
-                  <div style="width:320px">
-                    <div class="muted small">Variable Palette (drag into editor)</div>
-                    <div id="dataPalette" style="margin-top:8px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;"></div>
-                    <div class="muted small" style="margin-top:12px">Tip: Drag an item to the editor to insert <code>{{api.path}}</code>. For loops, insert <code>{{#each api.path}}</code> and <code>{{/each}}</code> around a block and use <code>{{this.field}}</code> inside.</div>
-                  </div>
-                </div>
-              </div>
-
-            <!-- GrapesJS editor modal -->
-            <div id="gjs-modal" style="display:none;position:fixed;inset:40px;background:rgba(7,18,34,0.9);z-index:9999;padding:12px;border-radius:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <div style="color:#fff;font-weight:700">Visual Editor</div>
-                <div>
-                  <button id="saveVisualBtn" class="btn">Save</button>
-                  <button id="closeVisualBtn" class="btn ghost">Close</button>
-                </div>
-              </div>
-                  <div id="gjs" style="height:80%"></div>
             </div>
           </div>
         </div>
       </main>
-    </div>
-
-    <script src="/admin-static/utils.js"></script>
-    <script src="https://unpkg.com/grapesjs/dist/grapes.min.js"></script>
+    </div>    <script src="/admin-static/utils.js"></script>
     <script src="/admin-static/app.js"></script>
     <script src="/admin-static/templates.js"></script>
     <script src="/admin-static/dragdrop.js"></script>

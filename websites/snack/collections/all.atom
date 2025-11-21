@@ -1,0 +1,1009 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:s="http://jadedpixel.com/-/spec/shopify">
+  <id>https://thesnacksmackindia.com/collections/all.atom</id>
+  <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/collections/all"/>
+  <link rel="self" type="application/atom+xml" href="https://thesnacksmackindia.com/collections/all.atom"/>
+  <title>My Store</title>
+  <updated>2025-07-01T14:24:24+05:30</updated>
+  <author>
+    <name>My Store</name>
+  </author>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7678947065958</id>
+    <published>2025-07-01T14:24:24+05:30</published>
+    <updated>2025-07-01T14:24:24+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/oyes-tangy-pudina-pack-of-2-thesnacksmack"/>
+    <title>Oyes Tangy Pudina | pack of 2 | thesnacksmack</title>
+    <s:type>Snack</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2096.jpg?v=1751359915"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Snack<br>
+        <strong>Price: </strong>
+            20.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Oyes Tangy Pudina is a snack food known for its refreshing and crispy texture. It is a type of flavored crisps or puffs that combines a tangy taste with the flavor of pudina (mint). The brand Oyes is renowned for its Indian-inspired flavors, with its signature offering being the "Tangy Pudina" flavor.</span><span><span jscontroller="JHnpme" class="pjBG2e" data-cid="f38c2139-87b4-4e92-bce4-bb6031b9b2c1" jsaction="rcuQ6b:npT2md"><span class="UV3uM"></span></span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7678947065958</id>
+      <title>Default Title</title>
+      <s:price currency="INR">20.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7678945493094</id>
+    <published>2025-07-01T14:21:12+05:30</published>
+    <updated>2025-07-01T14:21:12+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/oyes-chinese-tadka-pack-of-2-thesnacksmack"/>
+    <title>Oyes chinese tadka | pack of 2 | thesnacksmack</title>
+    <s:type>Snack</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2090.jpg?v=1751359761"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Snack<br>
+        <strong>Price: </strong>
+            20.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>O</span><span>Indulge in the flavorful combination of Chinese and Indian spices with Yes Chinese Tadka - a type of O'Yes Delicious Puffs. These crunchy, puffed snacks have a unique and savory "tadka" taste that is sure to please your taste buds.</span><span> </span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7678945493094</id>
+      <title>Default Title</title>
+      <s:price currency="INR">20.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7678943625318</id>
+    <published>2025-07-01T14:18:35+05:30</published>
+    <updated>2025-07-01T14:18:35+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/oyes-khatta-meetha-pack-of-2-thesnacksmack"/>
+    <title>Oyes Khatta Meetha | pack of 2 | thesnacksmack</title>
+    <s:type>Snack</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2095.jpg?v=1751359605"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Snack<br>
+        <strong>Price: </strong>
+            20.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>The product "Oyes Khatta Meetha" is a type of Indian snack that offers a sweet and sour taste. The name comes from the Hindi/Urdu phrase, meaning "sweet and sour", and is one of the puff snack flavors offered by the Oyes brand.</span><span><span jscontroller="JHnpme" class="pjBG2e" data-cid="0de90260-09ee-4df2-a8f1-c239897b7690" jsaction="rcuQ6b:npT2md"><span class="UV3uM"></span></span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7678943625318</id>
+      <title>Default Title</title>
+      <s:price currency="INR">20.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7678941560934</id>
+    <published>2025-07-01T14:16:29+05:30</published>
+    <updated>2025-07-01T14:16:29+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/oyes-cocktail-pack-of-2-thesnacksmack"/>
+    <title>Oyes Cocktail | pack of 2 | thesnacksmack</title>
+    <s:type>Snack</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2097.jpg?v=1751359428"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Snack<br>
+        <strong>Price: </strong>
+            20.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Oyes Cocktail" is a brand of flavored puff snacks that are not your typical mixed drink. They have a unique texture, with a sweet and tangy flavor that has gained popularity in India.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7678941560934</id>
+      <title>Default Title</title>
+      <s:price currency="INR">20.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7673761693798</id>
+    <published>2025-06-22T17:08:22+05:30</published>
+    <updated>2025-06-22T17:08:22+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/home-made-roasted-seviya"/>
+    <title>Home made roasted seviyan</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2053.jpg?v=1750592178"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            100.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7673761693798</id>
+      <title>250g</title>
+      <s:price currency="INR">100.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7673753174118</id>
+    <published>2025-06-22T17:00:10+05:30</published>
+    <updated>2025-06-22T17:00:10+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/maharaja-box-31-iteams-in-one-box"/>
+    <title>Maharaja box ( 31 iteams in one box)</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2025.jpg?v=1750591167"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            430.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>Mango slice</p>
+<p>chand sitare</p>
+<p>Hing pedal</p>
+<p>Am pachan</p>
+<p>Mango masti </p>
+<p>Chaapat</p>
+<p>Coconut laddo pack</p>
+<p>Anardana goli</p>
+<p>Guru chela</p>
+<p>Lal jeera</p>
+<p>Hing anardana goli</p>
+<p>Chatmola</p>
+<p>Hungama churan</p>
+<p>Chocolate coin</p>
+<p>Mango masti pipe</p>
+<p>Jamun goal</p>
+<p>Imli goal</p>
+<p>Khattam khatta</p>
+<p>Khatori</p>
+<p>Choki choki</p>
+<p>Lal juban</p>
+<p>Rochak</p>
+<p>Fatafat</p>
+<p>Shaktiman churan </p>
+<p>Kopiko candy </p>
+<p>Bomb blast candy</p>
+<p>Kaccha mango candy</p>
+<p> Coffey bite</p>
+<p>Imli stick</p>
+<p>Magic pops</p>
+<p>Colourful star </p>
+<p> </p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7673753174118</id>
+      <title>Default Title</title>
+      <s:price currency="INR">430.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7654767722598</id>
+    <published>2025-05-27T19:56:37+05:30</published>
+    <updated>2025-05-27T19:56:37+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/mango-slice-pack-of-50g-the-snack-smack"/>
+    <title>Mango slice | pack of 50g the snack smack</title>
+    <s:type>Snack</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8205.png?v=1747366963"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Snack<br>
+        <strong>Price: </strong>
+            30.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>As an expert in the field, I can inform you that Mango slice is a delicious and chewy candy with a distinct mango flavor. Typically available in rectangular or slice-shaped pieces, this candy is known for its fruity taste. Variations from different brands may include sweet and sour options as well as additional flavors such as pineapple.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7654767722598</id>
+      <title>Default Title</title>
+      <s:price currency="INR">30.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7654767100006</id>
+    <published>2025-05-27T19:54:55+05:30</published>
+    <updated>2025-05-27T19:54:55+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/khatori-the-snacksmack"/>
+    <title>Khatori | The Snacksmack</title>
+    <s:type>Snack</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8437.webp?v=1748355735"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Snack<br>
+        <strong>Price: </strong>
+            30.00 - 60.00
+            <a href="https://thesnacksmackindia.com/products/khatori-the-snacksmack">(2 variants)</a>
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><div class="product__description rte quick-add-hidden">
+<p>Khatori is a most lovable snack for 70’s kids and pregnant women as it has a dry slice of green mango with a sour flavour amazing for pregnancy cravings.</p>
+</div>
+<p> </p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7654767100006</id>
+      <title>15</title>
+      <s:price currency="INR">30.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7654767100006</id>
+      <title>30</title>
+      <s:price currency="INR">60.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7649871560806</id>
+    <published>2025-05-27T19:52:56+05:30</published>
+    <updated>2025-05-27T19:52:56+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/untitled-may16_04-42"/>
+    <title>Hing peda | pack of 50g | the snack smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8239.png?v=1747606364"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            30.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Hing peda is a classic Indian sweet treat typically made with hing (asafoetida), sugar, and a variety of fragrant spices. It is renowned for its digestive properties and is commonly consumed after meals to aid in digestion and alleviate discomfort.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7649871560806</id>
+      <title>Default Title</title>
+      <s:price currency="INR">30.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7644660826214</id>
+    <published>2025-05-10T14:29:21+05:30</published>
+    <updated>2025-05-10T14:29:21+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/shaktiman-churan-aamkoot-churan-the-snack-smack"/>
+    <title>Shaktiman churan | aamkoot churan  |The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2001.png?v=1746867269"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            35.00 - 70.00
+            <a href="https://thesnacksmackindia.com/products/shaktiman-churan-aamkoot-churan-the-snack-smack">(2 variants)</a>
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Shaktiman Churan is a popular, tangy Indian candy, sometimes referred to as Amkoot Churan. It's known for its sour and spicy flavor, often compared to other Indian candies like Khattam Khatta Get a taste of India with Shaktiman Churan – a tangy and spicy treat that will awaken your senses. Made with quality ingredients, this Indian candy is a delicious way to indulge in the unique flavors of this vibrant culture. Enjoy it on its own, or use it to add a kick of flavor to your favorite snacks or dishes.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7644660826214</id>
+      <title>40</title>
+      <s:price currency="INR">35.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7644660826214</id>
+      <title>80</title>
+      <s:price currency="INR">70.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7644660138086</id>
+    <published>2025-05-10T14:24:01+05:30</published>
+    <updated>2025-05-10T14:24:01+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/fatafat-pack-of-10-the-snack-smack"/>
+    <title>Fatafat | pack of 10  |The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-2005.png?v=1746866951"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            90.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Helps to alleviate indigestion, bloating, and other digestive discomforts. Offers a convenient and tasty way to support healthy digestion. May provide a refreshing sensation after meals.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7644660138086</id>
+      <title>Default Title</title>
+      <s:price currency="INR">90.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642967933030</id>
+    <published>2025-05-06T03:53:45+05:30</published>
+    <updated>2025-05-06T03:53:45+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/choki-choki-chocolate-pack-of-15-the-snack-smack"/>
+    <title>Choki choki | chocolate pack of 10 | the snack smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>My Store</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8068.png?v=1746483495"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>My Store<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            35.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Choki Choki is a brand of chocolate paste made by Mayora in Indonesia, primarily packaged in individual tube-like containers. It's a popular snack, especially among children, and known for its silky chocolate flavor and convenient format Featuring a silky chocolate flavor and convenient packaging, Choki Choki is a must-try treat for children and adults alike in Indonesia.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642967933030</id>
+      <title>Default Title</title>
+      <s:price currency="INR">35.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642967408742</id>
+    <published>2025-05-06T03:40:25+05:30</published>
+    <updated>2025-05-06T03:40:25+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/alpenliebe-gold-caramel-toffee-pack-of-20-the-snack-smack"/>
+    <title>Alpenliebe Gold Caramel Toffee | pack of 20 | the snack smack</title>
+    <s:type></s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-1948.png?v=1746184098"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong><br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Alpenliebe Gold Caramel Toffee is expertly crafted with a blend of sugar, glucose syrup, skimmed milk powder, hydrogenated vegetable fat, butter, flavorings, emulsifiers, and artificial colors. This creamy toffee treat, beloved by both children and adults, can be likened to golden chocolate coins as depicted in the product image.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642967408742</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7641926074470</id>
+    <published>2025-05-06T02:00:30+05:30</published>
+    <updated>2025-05-06T02:00:30+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/untitled-may2_12-07"/>
+    <title>Mango Masti Pipe | the snacksmack India</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8066.png?v=1746232023"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            60.00 - 100.00
+            <a href="https://thesnacksmackindia.com/products/untitled-may2_12-07">(2 variants)</a>
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Satisfy your sweet cravings with mango masti pipes </span><b>Each piece is bursting with fruity mango flavor and offers a satisfying chewy texture</b><span>. Perfect for enjoying on the go or as a fun treat to share with friends. Indulge in the juicy goodness of our delightful pipe-shaped candies today!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7641926074470</id>
+      <title>25</title>
+      <s:price currency="INR">60.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7641926074470</id>
+      <title>50</title>
+      <s:price currency="INR">100.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642284884070</id>
+    <published>2025-05-06T02:00:20+05:30</published>
+    <updated>2025-05-06T02:00:20+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/untitled-may3_02-08"/>
+    <title>Kopiko candy  | pack of 20 | The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8070.png?v=1746233065"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span></span><span>Kopiko candy, made in India, contains a real coffee extract as well as sugar, glucose syrup, vegetable oil, butter, and emulsifiers. The coffee extract is sourced from Indonesian coffee beans, giving it a rich flavor, and is complemented by soy lecithin, caramel color, salt, and natural coffee flavoring.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642284884070</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642951123046</id>
+    <published>2025-05-06T01:53:21+05:30</published>
+    <updated>2025-05-06T01:53:21+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/pulse-candy-pack-of-20-the-snack-smack"/>
+    <title>Pulse candy | pack of 20 | The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>My Store</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8110.webp?v=1746476594"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>My Store<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Pulse candy is a type of candy that comes in a variety of flavours, including mango, and tamarind and pink guava .</span><span>It's described as having four stages when eaten.</span></p>
+<div class="WaaZC">
+<div class="RJPOee EIJn2">
+<ol data-hveid="CBYQAQ" data-ved="2ahUKEwitvayZv9aKAxWGK_sDHbN0CSAQnPYKegQIFhAB">
+<li value="1">
+<span><strong>Stage I</strong>: </span><span>A sensational Kacchaa Aam flavor </span>
+</li>
+<li value="2">
+<span><strong>Stage II</strong>: </span><span>Powder slowly emerges into your mouth </span>
+</li>
+<li value="3">
+<span><strong>Stage III</strong>: </span><span>Amchur bursts into your mouth </span>
+</li>
+<li value="4">
+<span><strong>Stage IV</strong>: </span><span>A sweet taste when you reach the end of the candy </span>
+</li>
+</ol>
+</div>
+</div>
+<div class="WaaZC">
+<div class="RJPOee EIJn2">
+<div class="rPeykc" data-hveid="CBsQAQ" data-ved="2ahUKEwitvayZv9aKAxWGK_sDHbN0CSAQo_EKegQIGxAB">
+<span>Pulse candy is gluten free and egg free, and some varieties are also vegan and non-GMO. </span><span>The ingredients typically include sugar, liquid glucose, dextrose, and candy masala, which is made up of edible common salt, spices, and condiments.</span>
+</div>
+</div>
+</div></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642951123046</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642950991974</id>
+    <published>2025-05-06T01:51:12+05:30</published>
+    <updated>2025-05-06T01:51:12+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/melody-toffy-pack-of-20-the-snack-smack"/>
+    <title>Melody Toffy | pack of 20 | The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8108.webp?v=1746476499"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>Melody Toffy provides the perfect snack for anyone looking for a delicious and guilt-free treat. Made from high-quality ingredients, each bag contains 90 individually wrapped pieces of heaven. It's the ideal snack for satisfying cravings and giving you a boost of energy. With Melody Toffy, you'll never have to compromise taste for nutrition.<span></span></p>
+<p><span>Melody is a sweet, creamy candy with a caramel layer on the outside and a chocolate filling on the inside . </span><span>It's made from ingredients like milk, sugar, egg yolks, butter, and chocolate. </span><span>Melody is a popular snack for both children and adults</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642950991974</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642950828134</id>
+    <published>2025-05-06T01:49:55+05:30</published>
+    <updated>2025-05-06T01:49:55+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/mango-bite-toffy-pack-of-20-the-snack-smack"/>
+    <title>Mango Bite Toffy | pack of 20 |The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8106.webp?v=1746476371"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><ul class="a-unordered-list a-vertical a-spacing-none">
+<li class="a-spacing-mini"><span class="a-list-item">KACCHA MANGO FLAVOURED CANDY: Parle Mango bite Candy has unique taste, it will fulfill your taste buds. This product is made from the right proportion to make the special taste of the aam.</span></li>
+<li class="a-spacing-mini"><span class="a-list-item">IDEAL FOR KIDS: Parle Mango Bite is Ideal for kids who are looking for something that can give a perfect taste of mango.</span></li>
+<li class="a-spacing-mini"><span class="a-list-item">INGREDIENTS: This Mango Bite is contains ingredients like Sugar, Liquid glucose, Lactic acid, Artificial raw mango flavor, FD &amp; C yellow 5, FD &amp; C blue 1.</span></li>
+<li class="a-spacing-mini"><span class="a-list-item">WELL PACKED: Delicious &amp; Tasty Mango Bite is prepared, processed and packed in a very hygienic condition to ensure better quality and authentic flavour. Natural &amp; Pure, Mouth-watering Flavor &amp; Aroma Premium pre packed prime quality Parle Mango bite.</span></li>
+</ul></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642950828134</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642950664294</id>
+    <published>2025-05-06T01:46:32+05:30</published>
+    <updated>2025-05-06T01:46:32+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/juzt-jelly-pack-of-20-the-snack-smack"/>
+    <title>Juzt jelly| pack of 20 | The Snack Smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8104.webp?v=1746476170"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Alpenliebe Juzt Jelly in Strawberry flavor, enjoy the taste of juicy jellies. This delicious </span><b>pulpy jelly are made with 25% fruit pulp</b><span>. The goodness of 25% fruit pulp makes it yummy and ideal for consumption by kids and grown ups alike. Available in an attractive family pack to enjoy with friends and family.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642950664294</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642949746790</id>
+    <published>2025-05-06T01:44:08+05:30</published>
+    <updated>2025-05-06T01:44:08+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/centre-fruit-pack-of-20-the-snacksmack"/>
+    <title>Centre fruit | pack of 20 | The Snacksmack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8102.webp?v=1746475897"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>With a variety of ingredients like sugar, liquid glucose, and flavorings, Centre Fruit chewing gum is a delicious and satisfying way to indulge in a fruity treat.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642949746790</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642949124198</id>
+    <published>2025-05-06T01:36:56+05:30</published>
+    <updated>2025-05-06T01:36:56+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/centre-fresh-pack-of-20-the-snacksmack"/>
+    <title>Centre fresh | pack of 20 | The Snacksmack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8100.webp?v=1746475821"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Enjoy the refreshing burst of flavor in every bite, without worrying about artificial ingredients. With a blend of natural sweeteners and flavorings, Centre fresh is a delicious and guilt-free treat.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642949124198</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642947256422</id>
+    <published>2025-05-06T01:35:05+05:30</published>
+    <updated>2025-05-06T01:35:05+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/spinner-firki-pack-of-20-the-snack-smack"/>
+    <title>Spinner firki | pack of 15 | the snack smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8094.png?v=1746475091"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            30.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Spinner candy, also known as "Firki" in some regions, is a type of lollipop that has a built-in crank handle, allowing the candy to be spun.You can play as well as eat </span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642947256422</id>
+      <title>Default Title</title>
+      <s:price currency="INR">30.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642946633830</id>
+    <published>2025-05-06T01:26:55+05:30</published>
+    <updated>2025-05-06T01:26:55+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/chocolate-gold-coins-pack-of-15-the-snack-smack"/>
+    <title>Chocolate gold coins | pack of 15 | the snack smack</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8098_e691613e-9aff-440b-8880-45575e8c9e79.png?v=1746479431"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            35.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><div class="rL5Dpb C6FfRd" jsmodel="Wn3aEc" jscontroller="LdB9sd" data-ivep="true" jsshadow="" jsaction="PdWSXe:h5M12e;rcuQ6b:npT2md;" jsdata="X2sNs;_;COhjsE">
+<div jsslot="">
+<div class="JeRFmc">
+<div class="lJt0Td ivg-i" data-mfiui="yoxdx5j0keCfXM" jsname="fBMxqf" role="button" jsaction="trigger.PdWSXe" data-hveid="CAIQAg" data-ved="2ahUKEwiFju_rjI2NAxUdRaQEHVdEGPAQ_40MegQIAhAC" tabindex="0">
+<div class="oLJ4Uc l3foLb wNCdhb"></div>
+</div>
+</div>
+</div>
+</div>
+<p><span></span><span>Chocolate gold coins are typically called chocolate coins or chocolate gelt. During Hanukkah, they are specifically referred to as Hanukkah gelt. These are chocolate coins wrapped in gold or silver foIl Indulge in a delectable tradition with our chocolate coins. Perfect for Hanukkah, these elegant treats are crafted with premium chocolate and wrapped in shimmering gold and silver foil.</span><span></span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642946633830</id>
+      <title>Default Title</title>
+      <s:price currency="INR">35.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642278232166</id>
+    <published>2025-05-03T06:12:02+05:30</published>
+    <updated>2025-05-03T06:12:02+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/boomer-chewing-gum-20pcs-the-snack-smack-india"/>
+    <title>Boomer | Chewing Gum | 20pcs | the snack smack india</title>
+    <s:type></s:type>
+    <s:vendor>My Store</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8064.png?v=1746232896"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>My Store<br>
+        <strong>Type: </strong><br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642278232166</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://thesnacksmackindia.com/products/7642277904486</id>
+    <published>2025-05-03T06:10:46+05:30</published>
+    <updated>2025-05-03T06:10:46+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://thesnacksmackindia.com/products/heartbeat-candy-with-strawberry-filling-inside-pack-of-20-the-snack-smack-india"/>
+    <title>Heartbeat Candy with strawberry filling inside | Pack of 20 | the snack smack india</title>
+    <s:type>Candy</s:type>
+    <s:vendor>Thesnacksmack</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0639/7968/3942/files/IMG-8063.png?v=1746232747"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>Thesnacksmack<br>
+        <strong>Type: </strong>Candy<br>
+        <strong>Price: </strong>
+            40.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Hart Beat Corazon Belove Candy - Strawberry Mint Flavoured Liquid Center Filled, Contains Natural Flavours. About the Product. Hartbeat love candy is </span><b>a naturally flavoured, individually wrapped candy loved by all</b></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://thesnacksmackindia.com/products/7642277904486</id>
+      <title>Default Title</title>
+      <s:price currency="INR">40.00</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+</feed>

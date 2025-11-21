@@ -12,12 +12,13 @@ AppBuilder is a comprehensive no-code platform for building data-driven web appl
 ## Structure
 
 **Root-Level Components:**
+
 - **server.js** - Main Express.js server handling API proxy, metadata aggregation, and template processing
 - **admin.html** - Admin interface markup for site and API management
 - **admin-static/** - Frontend application files (app.js, style.css, utils.js) for admin UI
 - **websites/demo/** - Demo website templates and sample pages
 - **logger.js** - Custom logging utility with file and console output
-- **db.json** - JSON-based data storage for sites and API configurations
+- **api-repo.json** - JSON-based data storage for sites and API configurations
 - **eslinrc.js** - ESLint configuration with airbnb/prettier standards
 
 ## Language & Runtime
@@ -30,6 +31,7 @@ AppBuilder is a comprehensive no-code platform for building data-driven web appl
 ## Dependencies
 
 **Main Dependencies:**
+
 - **express** ^4.18.2 - Web server framework
 - **axios** ^1.5.0 - HTTP client for API requests
 - **cors** ^2.8.5 - Cross-Origin Resource Sharing middleware
@@ -37,6 +39,7 @@ AppBuilder is a comprehensive no-code platform for building data-driven web appl
 - **lodash.get** ^4.4.2 - Utility for safely accessing nested object properties
 
 **Development Dependencies:**
+
 - **nodemon** ^2.0.22 - Auto-restart on file changes (dev mode)
 - **eslint** ^9.39.1 - Code linting and quality analysis
 - **babel-eslint** ^10.1.0 - JavaScript parser for eslint
@@ -46,16 +49,19 @@ AppBuilder is a comprehensive no-code platform for building data-driven web appl
 ## Build & Installation
 
 **Install dependencies:**
+
 ```bash
 npm install
 ```
 
 **Start server (production):**
+
 ```bash
 npm start
 ```
 
 **Start server (development with auto-reload):**
+
 ```bash
 npm run dev
 ```
@@ -89,7 +95,8 @@ Uses airbnb style guide with React support, import/export sorting, unused import
 
 **Testing Approach:** Manual testing via admin interface  
 **Test Guide Location:** TESTING_GUIDE.md (comprehensive step-by-step testing instructions)  
-**Test Scope:** 
+**Test Scope:**
+
 - Variable palette display and API information
 - GET API table generation
 - POST/PUT/PATCH form generation with type inference
@@ -99,6 +106,7 @@ Uses airbnb style guide with React support, import/export sorting, unused import
 - Live preview rendering
 
 **Testing Uses:**
+
 - JSONPlaceholder API (https://jsonplaceholder.typicode.com) for sample data
 - httpbin.org for type inference validation
 
@@ -109,7 +117,7 @@ Uses airbnb style guide with React support, import/export sorting, unused import
 - No authentication, caching, or advanced templating in current version
 - Best practices for production: Add auth, caching, robust JSON-path validation, and comprehensive error handling
 - API responses must be valid JSON; no advanced error recovery
-- Uses JSON file storage (db.json) - not suitable for concurrent operations in production
+- Uses JSON file storage (api-repo.json) - not suitable for concurrent operations in production
 
 ## Documentation
 

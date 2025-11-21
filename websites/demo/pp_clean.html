@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+  <html lang="en">
+
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>All Products – My Store</title>
+      <meta name="description" content="All products">
+      <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #ffffff;
+            --color-fg: #121212;
+            --color-gray: #f3f3f3;
+            --color-border: #e5e5e5;
+            --color-dark: #242833;
+            --color-dark-text: #ffffff;
+            --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --transition: 0.3s ease;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--color-fg);
+            background-color: var(--color-bg);
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .announcement-bar {
+            background-color: var(--color-dark);
+            color: var(--color-dark-text);
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--color-fg);
+            font-weight: 500;
+            transition: opacity var(--transition);
+        }
+
+        nav a:hover {
+            opacity: 0.7;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--color-fg);
+            font-size: 1.2rem;
+        }
+
+        .cart-count {
+            position: relative;
+        }
+
+        .cart-count::after {
+            content: '1';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--color-fg);
+            color: var(--color-bg);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Banner Slider */
+        .banner-slider {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--color-fg);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem 3rem;
+            border-radius: 8px;
+        }
+
+        .slide-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .slide-content p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background-color: var(--color-fg);
+            color: var(--color-bg);
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity var(--transition);
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--color-fg);
+            border: 2px solid var(--color-fg);
+        }
+
+        .slider-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .slider-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .slider-counter {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        /* Collection Header */
+        .collection-header {
+            background-color: var(--color-dark);
+            color: var(--color-dark-text);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .collection-header h1 {
+            font-size: 2.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .products-section {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .filters {
+            flex: 0 0 250px;
+        }
+
+        .filter-group {
+            margin-bottom: 2rem;
+        }
+
+        .filter-group h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-grid-container {
+            flex: 1;
+        }
+
+        .sort-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .product-count {
+            font-weight: 500;
+        }
+
+        select {
+            padding: 0.5rem;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .product-card {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .product-image-wrapper {
+            position: relative;
+            padding-top: 125%;
+            overflow: hidden;
+            background-color: var(--color-gray);
+        }
+
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity var(--transition);
+        }
+
+        .product-image.hover-image {
+            opacity: 0;
+        }
+
+        .product-card:hover .product-image.hover-image {
+            opacity: 1;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-vendor {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-title {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .product-title a {
+            text-decoration: none;
+            color: var(--color-fg);
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            width: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .products-section {
+                flex-direction: column;
+            }
+
+            .filters {
+                flex: 1;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .slide-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .slide-content p {
+                font-size: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .product-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .product-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+    </style>
+    </head>
+
+    <body>
+      <!-- Announcement Bar -->
+      <div class="announcement-bar">
+        <p> Welcome to our indian store </p>
+      </div>
+      <!-- Header -->
+      <header>
+        <div class="header-content">
+          <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1894.jpg?v=1745574602&amp;width=600" alt="My Store" class="logo">
+          <nav>
+            <ul>
+              <li>
+                <a href="/">Home page</a>
+              </li>
+              <li>
+                <a href="/collections/new-launched">New launched</a>
+              </li>
+              <li>
+                <a href="/collections/our-best-seller">Our best seller</a>
+              </li>
+              <li>
+                <a href="/collections/all-products">All products</a>
+              </li>
+              <li>
+                <a href="/pages/hot-deals">Hot deals</a>
+              </li>
+            </ul>
+          </nav>
+          <div class="header-icons">
+            <button class="icon-button" aria-label="Search"> 🔍 </button>
+            <button class="icon-button" aria-label="Account"> 👤 </button>
+            <button class="icon-button cart-count" aria-label="Cart"> 🛒 </button>
+          </div>
+        </div>
+      </header>
+      <!-- Banner Slider -->
+      <section class="banner-slider">
+        <div class="slide active">
+          <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1894.jpg?v=1745574602&amp;width=3840" alt="Banner 1">
+          <div class="slide-content">
+            <h1>
+              <strong>BRINGING BACK WHAT WE LOST</strong>
+            </h1>
+            <p>
+              <strong>90's candies remind you of childhood nostalgia Take a trip down memory lane</strong>
+            </p>
+            <a href="/collections/all" class="btn btn-secondary">View all products</a>
+          </div>
+        </div>
+        <div class="slide">
+          <img src="https://thesnacksmackindia.com/cdn/shop/files/Coming_Soon_Website_in_Black_Turquoise_Neon_Green_Bold_Gradient_Style_1.png?v=1745547506&amp;width=3840" alt="Banner 2">
+          <div class="slide-content">
+            <h1>
+              <strong>Craving desi treats?</strong>
+            </h1>
+            <p>
+              <strong>Use NEW10 and get 10% off on your first order!</strong>
+            </p>
+            <a href="/collections/all" class="btn btn-secondary">View all products</a>
+          </div>
+        </div>
+        <div class="slider-controls">
+          <button class="slider-btn" id="prevBtn" aria-label="Previous slide"> ‹ </button>
+          <span class="slider-counter">
+            <span id="currentSlide">1</span> / 2
+          </span>
+          <button class="slider-btn" id="nextBtn" aria-label="Next slide"> › </button>
+        </div>
+      </section>
+      <!-- Collection Header -->
+      <section class="collection-header">
+        <h1> All Products </h1>
+      </section>
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="products-section">
+          <!-- Filters Sidebar -->
+          <aside class="filters">
+            <div class="filter-group">
+              <h3> Availability </h3>
+              <label class="filter-option">
+                <input type="checkbox" id="inStock">
+                <span>In stock (63)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="outOfStock" disabled>
+                <span>Out of stock (0)</span>
+              </label>
+            </div>
+            <div class="filter-group">
+              <h3> Price </h3>
+              <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"> The highest price is Rs. 430.00 </p>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="number" placeholder="From" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 4px;">
+                <span>-</span>
+                <input type="number" placeholder="To" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 4px;">
+              </div>
+            </div>
+            <button class="btn" style="width: 100%; margin-top: 1rem;"> Remove all </button>
+          </aside>
+          <!-- Product Grid -->
+          <div class="product-grid-container">
+            <div class="sort-bar">
+              <span class="product-count">2 products</span>
+              <div>
+                <label for="sortBy">Sort by: </label>
+                <select id="sortBy">
+                  <option value="featured">Featured</option>
+                  <option value="best-selling">Best selling</option>
+                  <option value="alpha-asc" selected>Alphabetically, A-Z</option>
+                  <option value="alpha-desc">Alphabetically, Z-A</option>
+                  <option value="price-asc">Price, low to high</option>
+                  <option value="price-desc">Price, high to low</option>
+                  <option value="date-asc">Date, old to new</option>
+                  <option value="date-desc">Date, new to old</option>
+                </select>
+              </div>
+            </div>
+            <ul class="product-grid">
+              <!-- Product 1 -->
+              <li class="product-card">
+                <div class="product-image-wrapper">
+                  <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1688.jpg?v=1744703273&amp;width=533" alt="Aam papad | one bar | The Snack Smack" class="product-image">
+                  <img src="https://thesnacksmackindia.com/cdn/shop/files/LunarNewYearMenuinLightYellowRedModernIllustrativeStyle_1080x1350px_60806aee-e065-460d-ad8d-251999bb101f.jpg?v=1744703273&amp;width=533" alt="Aam papad | one bar | The Snack Smack" class="product-image hover-image">
+                </div>
+                <div class="product-info">
+                  <div class="product-vendor"> Thesnacksmack </div>
+                  <h3 class="product-title">
+                    <a href="/products/aam-papad-one-bar-the-snack-smack">Aam papad | one bar | The Snack Smack</a>
+                  </h3>
+                  <div class="product-price"> Rs. 30.00 </div>
+                  <button class="btn add-to-cart"> Add to cart </button>
+                </div>
+              </li>
+              <!-- Product 2 -->
+              <li class="product-card">
+                <div class="product-image-wrapper">
+                  <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG-1948.png?v=1746184098&amp;width=533" alt="Alpenliebe Gold Caramel Toffee" class="product-image">
+                  <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG-1950.jpg?v=1746184098&amp;width=533" alt="Alpenliebe Gold Caramel Toffee" class="product-image hover-image">
+                </div>
+
+
+
+                <div class="product-info">
+                  <div class="product-vendor"> Thesnacksmack </div>
+                  <h3 class="product-title">
+                    <a href="/products/alpenliebe-gold-caramel-toffee-pack-of-20-the-snack-smack">Alpenliebe Gold Caramel Toffee | pack of 20 | the snack smack</a>
+                  </h3>
+                  <div class="product-price"> Rs. 40.00 </div>
+                  <button class="btn add-to-cart"> Add to cart </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </main>
+      <!-- Clean Multirow / Multicolumn / Newsletter / Footer (cleaned) -->
+      <section class="clean-multirow" style="background:var(--color-bg);">
+        <div style="max-width:1200px;margin:0 auto;padding:2rem;display:grid;grid-template-columns:1fr;gap:2rem;">
+          <!-- Row 1: Image left, text right -->
+          <div style="display:grid;grid-template-columns:1fr;gap:1rem;align-items:center;">
+            <div style="display:flex;flex-direction:row;gap:1rem;align-items:center;flex-wrap:wrap;">
+              <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1849.jpg?v=1744649002&amp;width=1200" alt="Hot deals" style="width:48%;height:auto;object-fit:cover;border-radius:6px;">
+              <div style="width:48%;">
+                <h2 style="font-size:1.5rem;margin-bottom:0.5rem;"> MORE HOT DEALS AT THE SNACK SMACK </h2>
+                <p style="color:#666;margin-bottom:1rem;"> Curated offers and limited-time discounts — grab them while they last. </p>
+              </div>
+            </div>
+          </div>
+          <!-- Row 2: Image right, text left -->
+          <div style="display:flex;flex-direction:row;gap:1rem;align-items:center;flex-wrap:wrap;">
+            <div style="width:48%;">
+              <h2 style="font-size:1.5rem;margin-bottom:0.5rem;"> FREE SHIPPING ON ORDERS ABOVE ₹1000 </h2>
+              <p style="color:#666;margin-bottom:1rem;"> Enjoy free delivery across eligible products when your order exceeds ₹1000. </p>
+              <button class="btn" disabled style="padding:0.6rem 1rem;border-radius:6px;border:1px solid var(--color-fg);background:transparent;color:var(--color-fg);"> LEARN MORE </button>
+            </div>
+            <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1848.jpg?v=1744649032&amp;width=1200" alt="Free shipping" style="width:48%;height:auto;object-fit:cover;border-radius:6px;">
+          </div>
+          <!-- Multicolumn / Spotlight -->
+          <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+            <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1850.jpg?v=1744649090&amp;width=1200" alt="Spotlight" style="width:40%;height:auto;object-fit:cover;border-radius:6px;">
+            <div style="width:58%;">
+              <p style="font-weight:600;margin-bottom:0.5rem;"> BRINGING BACK WHAT WE LOST </p>
+              <p style="color:#444;"> The Memories, The Love and nostalgia for Indian candies is what we are bringing back to foreign lands. We made these countries our new home, brought a lot of things along here with us but still Candies were missing — so we are bringing it back for you. </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Newsletter (cleaned) -->
+      <section style="background:var(--color-gray);padding:2rem 0;">
+        <div style="max-width:900px;margin:0 auto;text-align:center;">
+          <h3 style="margin-bottom:0.5rem;"> Be the first to know about new collections and exclusive offers. </h3>
+          <form onsubmit="event.preventDefault();alert('Thanks — subscription simulated.');" style="margin-top:1rem;display:flex;gap:0.5rem;justify-content:center;align-items:center;">
+            <input type="email" placeholder="Email" required style="padding:0.6rem 0.8rem;border:1px solid var(--color-border);border-radius:6px;width:60%;max-width:360px;">
+            <button type="submit" class="btn" style="padding:0.6rem 1rem;border-radius:6px;border:1px solid var(--color-fg);background:var(--color-fg);color:var(--color-bg);"> Subscribe </button>
+          </form>
+        </div>
+      </section>
+      <!-- Footer (cleaned) -->
+      <footer style="background:var(--color-dark);color:var(--color-dark-text);padding:2rem 0;margin-top:2rem;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;justify-content:space-between;">
+          <div style="flex:1;min-width:220px;">
+            <img src="https://thesnacksmackindia.com/cdn/shop/files/IMG_1894.jpg?v=1745574602&amp;width=300" alt="logo" style="height:48px;object-fit:contain;margin-bottom:0.5rem;">
+            <p style="color:#cfcfcf;font-size:0.95rem;"> © 2025 My Store </p>
+          </div>
+          <div style="flex:2;display:flex;gap:2rem;flex-wrap:wrap;min-width:300px;">
+            <div>
+              <h4 style="margin-bottom:0.5rem;"> Shop </h4>
+              <ul style="list-style:none;padding:0;color:#cfcfcf;line-height:1.8;">
+                <li>
+                  <a href="/collections/all-products" style="color:inherit;text-decoration:none;">All products</a>
+                </li>
+                <li>
+                  <a href="/collections/new-launched" style="color:inherit;text-decoration:none;">New launched</a>
+                </li>
+                <li>
+                  <a href="/collections/our-best-seller" style="color:inherit;text-decoration:none;">Our best seller</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 style="margin-bottom:0.5rem;"> Policies </h4>
+              <ul style="list-style:none;padding:0;color:#cfcfcf;line-height:1.8;">
+                <li>
+                  <a href="/policies/privacy-policy" style="color:inherit;text-decoration:none;">Privacy policy</a>
+                </li>
+                <li>
+                  <a href="/policies/refund-policy" style="color:inherit;text-decoration:none;">Refund policy</a>
+                </li>
+                <li>
+                  <a href="/policies/terms-of-service" style="color:inherit;text-decoration:none;">Terms of service</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+      <!-- JavaScript -->
+      <script>
+        // Banner Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const slideCounter = document.getElementById('currentSlide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            slideCounter.textContent = index + 1;
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Auto-advance slides
+        setInterval(nextSlide, 5000);
+
+        // Add to Cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productTitle = this.closest('.product-card').querySelector('.product-title a').textContent;
+                alert(`Added "${productTitle}" to cart!`);
+            });
+        });
+
+        // Sort functionality
+        document.getElementById('sortBy').addEventListener('change', function() {
+            console.log('Sorting by:', this.value);
+            // Sorting logic would go here
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                console.log('Filter changed:', this.id, this.checked);
+                // Filter logic would go here
+            });
+        });
+    </script>
+    </body>
+
+  </html>
+<div class="ab-get-component">GET userlist</div>
