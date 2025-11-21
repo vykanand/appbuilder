@@ -363,6 +363,20 @@ app.put('/api/sites/:siteName/apis/:apiName', (req, res) => {
   res.json(api);
 });
 
+// Delete an API definition for a site
+app.delete('/api/sites/:siteName/apis/:apiName', (req, res) => {
+  const siteName = req.params.siteName;
+  const apiName = req.params.apiName;
+  const db = readDB();
+  const s = db.sites.find(x => x.name === siteName);
+  if (!s) return res.status(404).json({ error: 'site not found' });
+  const idx = s.apis.findIndex(a => a.name === apiName);
+  if (idx === -1) return res.status(404).json({ error: 'api not found' });
+  s.apis.splice(idx, 1);
+  writeDB(db);
+  res.json({ ok: true });
+});
+
 // Persist UI-driven actions (button/form -> API mappings)
 app.post('/api/sites/:siteName/actions', (req, res) => {
   const { selector, apiName, method, fields, page } = req.body || {};

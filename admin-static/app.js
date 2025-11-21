@@ -311,10 +311,12 @@ document.addEventListener('DOMContentLoaded', function() {
           left.appendChild(methodBadge);
           left.appendChild(meta);
           const right = document.createElement('div');
-          let buttonsHtml = `<button class="btn small outline" data-edit-api="${a.name}">Edit</button> <button class="btn small" data-api="${a.name}">Test</button>`;
+          let buttonsHtml = `<button class="btn small outline" data-edit-api="${a.name}">Edit</button> <button class="btn small success" data-api="${a.name}">Test</button>`;
           if(['POST','PUT','PATCH'].includes(methodText)) {
             buttonsHtml += ` <button class="btn small success" data-form-builder="${a.name}" data-method="${methodText}">Form Builder</button>`;
           }
+          // Delete button for removing API definitions
+          buttonsHtml += ` <button class="btn small danger" data-delete-api="${a.name}">Delete</button>`;
           right.innerHTML = buttonsHtml;
 
           // Add page usage info
@@ -1312,6 +1314,25 @@ if(apiListEl) {
       } else {
         showMessage('API not found', 'Error');
       }
+      return;
+    }
+    // Delete API button
+    const deleteApi = btn.dataset.deleteApi;
+    if(deleteApi){
+      if(!selectedSite){ showMessage('Select a site first','Error'); return; }
+      // confirm deletion with the user
+      const ok = confirm(`Delete API "${deleteApi}"? This cannot be undone.`);
+      if(!ok) return;
+      try{
+        AppUtils.Loader && AppUtils.Loader.show && AppUtils.Loader.show('Deleting API...');
+        const resp = await fetch(`/api/sites/${selectedSite.name}/apis/${encodeURIComponent(deleteApi)}`, { method: 'DELETE' });
+        AppUtils.Loader && AppUtils.Loader.hide && AppUtils.Loader.hide();
+        if(!resp.ok){ const txt = await resp.text(); throw new Error(txt || 'Delete failed'); }
+        // remove from local site state and re-render
+        if(selectedSite && selectedSite.apis){ selectedSite.apis = (selectedSite.apis||[]).filter(a=>a.name !== deleteApi); }
+        await renderSiteDetails();
+        showMessage('API deleted', 'Deleted');
+      }catch(err){ AppUtils.Loader && AppUtils.Loader.hide && AppUtils.Loader.hide(); console.error(err); showMessage('Could not delete API: ' + (err && err.message ? err.message : ''),'Error'); }
       return;
     }
   });
