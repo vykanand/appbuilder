@@ -78,26 +78,10 @@
                 <h3>APIs</h3>
                 <div id="apiList" class="list"></div>
                 <div class="divider"></div>
-                <input id="apiNameInput" placeholder="API name (identifier)" />
-                <input id="apiUrlInput" placeholder="https://api.example.com/endpoint" />
-                <div class="two-col">
-                  <select id="apiMethodSelect" style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);">
-                    <option value="GET" selected>GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="PATCH">PATCH</option>
-                    <option value="DELETE">DELETE</option>
-                    <option value="OPTIONS">OPTIONS</option>
-                    <option value="HEAD">HEAD</option>
-                  </select>
-                  <input id="apiHeadersInput" placeholder='Headers (JSON)' />
+                <div style="display:flex;gap:8px;align-items:center">
+                  <button id="addApiBtn" class="btn">+ Add API</button>
+                  <div class="muted small" style="margin-left:8px">Open the REST client to create or configure an API</div>
                 </div>
-                <div class="divider"></div>
-                <label style="margin-top:8px">Query Params (JSON)</label>
-                <input id="apiParamsInput" placeholder='{"q":"search"}' />
-                <label>Body Template (JSON or raw)</label>
-                <textarea id="apiBodyInput" placeholder='{"key": "value"}' style="min-height:80px"></textarea>
-                <button id="addApiBtn" class="btn">Add API</button>
               </div>
             </div>
 

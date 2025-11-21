@@ -858,15 +858,12 @@ const createPageBtn = qs('#createPageBtn'); if(createPageBtn) createPageBtn.addE
   }catch(e){ console.error(e); showMessage('Could not create page','Error'); }
 });
 
-// Add API
-const addApiBtn = qs('#addApiBtn'); if(addApiBtn) addApiBtn.addEventListener('click', async ()=>{
-  if(!selectedSite){ showMessage('Select a site first','Error'); return; }
-  const name = qs('#apiNameInput').value.trim(); const url = qs('#apiUrlInput').value.trim(); const method = (qs('#apiMethodSelect') && qs('#apiMethodSelect').value) ? qs('#apiMethodSelect').value : 'GET';
-  let headers = {}; try{ headers = JSON.parse(qs('#apiHeadersInput').value || '{}'); }catch(e){ showMessage('Invalid headers JSON','Input error'); return; }
-  let params = {}; try{ params = JSON.parse(qs('#apiParamsInput').value || '{}'); }catch(e){ showMessage('Invalid params JSON','Input error'); return; }
-  const bodyTemplate = qs('#apiBodyInput').value || null; if(!name || !url){ showMessage('Provide API name and URL','Input required'); return; }
-  await fetch(`/api/sites/${selectedSite.name}/apis`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,url,method,headers,params,bodyTemplate})});
-  qs('#apiNameInput').value=''; qs('#apiUrlInput').value=''; qs('#apiHeadersInput').value=''; qs('#apiParamsInput').value=''; qs('#apiBodyInput').value=''; await selectSite(selectedSite.name);
+// Add API — open REST client modal instead of native inline form
+const addApiBtn = qs('#addApiBtn');
+if (addApiBtn) addApiBtn.addEventListener('click', (e) => {
+  if (!selectedSite) { showMessage('Select a site first', 'Error'); return; }
+  // Open the REST client modal in "new API" mode
+  openRestClientModal('New API', {});
 });
 
 // manual mapping UI removed — mappings are created automatically from palette drops and visual editor bindings
